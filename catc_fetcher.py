@@ -11,7 +11,7 @@ def fetch_device_data(client):
         sites = []
         offset = 1
         limit = 500
-        items = 500
+        items = 501
 
         # Fetch all sites in Catalyst Center
         while items > limit:
