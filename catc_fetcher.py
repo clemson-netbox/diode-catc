@@ -2,7 +2,7 @@ import logging
 from dnacentersdk import api
 
 
-def fetch_data(client):
+def fetch_device_data(client):
     """
     Fetches data from Catalyst Center including sites and devices with their site associations.
     """

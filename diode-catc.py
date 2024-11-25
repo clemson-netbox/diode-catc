@@ -12,15 +12,54 @@ from version import __version__
 load_dotenv()
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Catalyst Center (CATC) to Diode Agent")
-    parser.add_argument("--diode-server", default=os.getenv("DIODE_SERVER"), help="Diode server address")
-    parser.add_argument("--diode-token", default=os.getenv("DIODE_TOKEN"), help="Diode API token")
-    parser.add_argument("--catc-host", default=os.getenv("CATC_HOST"), help="Catalyst Center host")
-    parser.add_argument("--catc-user", default=os.getenv("CATC_USER"), help="Catalyst Center username")
-    parser.add_argument("--catc-password", default=os.getenv("CATC_PASSWORD"), help="Catalyst Center password")
-    parser.add_argument("--catc-verify", default=os.getenv("CATC_VERIFY", "true").lower() in ("true", "1", "yes"), 
-                        help="Verify Catalyst Center SSL certificate (default: true)")
+    """
+    Parse command-line arguments with environment variable defaults,
+    making all arguments effectively required.
+    """
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser(description="Catalyst Center to Diode Agent")
+
+    parser.add_argument(
+        "--diode-server",
+        default=os.getenv("DIODE_SERVER"),
+        required=not os.getenv("DIODE_SERVER"),
+        help="Diode server address (or set via DIODE_SERVER environment variable)"
+    )
+    parser.add_argument(
+        "--diode-token",
+        default=os.getenv("DIODE_TOKEN"),
+        required=not os.getenv("DIODE_TOKEN"),
+        help="Diode API token (or set via DIODE_TOKEN environment variable)"
+    )
+    parser.add_argument(
+        "--catc-host",
+        default=os.getenv("CATC_HOST"),
+        required=not os.getenv("CATC_HOST"),
+        help="Catalyst Center host (or set via CATC_HOST environment variable)"
+    )
+    parser.add_argument(
+        "--catc-user",
+        default=os.getenv("CATC_USER"),
+        required=not os.getenv("CATC_USER"),
+        help="Catalyst Center username (or set via CATC_USER environment variable)"
+    )
+    parser.add_argument(
+        "--catc-password",
+        default=os.getenv("CATC_PASSWORD"),
+        required=not os.getenv("CATC_PASSWORD"),
+        help="Catalyst Center password (or set via CATC_PASSWORD environment variable)"
+    )
+    parser.add_argument(
+        "--catc-verify",
+        default=os.getenv("CATC_VERIFY", "true").lower() in ("true", "1", "yes"),
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        help="Verify Catalyst Center SSL certificate (default: true, or set via CATC_VERIFY environment variable)"
+    )
+
     return parser.parse_args()
+
 
 def main():
     # Parse arguments
@@ -54,28 +93,28 @@ def main():
             devices = fetch_device_data(catc)
             logging.info(f"Fetched {len(devices)} devices.")
 
-            logging.info("Fetching interface data for all devices...")
-            interfaces = []
-            for device in devices:
-                device_interfaces = fetch_interface_data(catc, device["id"])
-                interfaces.extend(device_interfaces)
-                logging.info(f"Fetched {len(device_interfaces)} interfaces for device {device['hostname']}.")
+            # logging.info("Fetching interface data for all devices...")
+            # interfaces = []
+            # for device in devices:
+            #     device_interfaces = fetch_interface_data(catc, device["id"])
+            #     interfaces.extend(device_interfaces)
+            #     logging.info(f"Fetched {len(device_interfaces)} interfaces for device {device['hostname']}.")
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
             device_entities = prepare_device_data(devices)
             logging.info(f"Transformed {len(device_entities)} devices.")
 
-            logging.info("Transforming interface data into Diode-compatible format...")
-            interface_entities = [
-                entity for iface in interfaces
-                for entity in prepare_interface_data(iface)
-            ]
-            logging.info(f"Transformed {len(interface_entities)} interfaces.")
+            # logging.info("Transforming interface data into Diode-compatible format...")
+            # interface_entities = [
+            #     entity for iface in interfaces
+            #     for entity in prepare_interface_data(iface)
+            # ]
+            # logging.info(f"Transformed {len(interface_entities)} interfaces.")
 
             # Ingest data into Diode
             logging.info("Ingesting data into Diode...")
-            response = client.ingest(entities=device_entities + interface_entities)
+            response = client.ingest(entities=device_entities)# + interface_entities)
             if response.errors:
                 logging.error(f"Errors during ingestion: {response.errors}")
             else:
