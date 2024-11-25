@@ -1,78 +1,86 @@
 import re
-import yaml
 import logging
 
 class Transformer:
-    def __init__(self, host_site_rules_path, host_tenant_rules_path, vm_role_rules_path, vm_tenant_rules_path, skip_rules_path):
+    def __init__(self):
         """
-        Initialize the Transformer with paths to regex rules for site and tenant mappings.
+        Initialize any shared state or configurations for transformations.
         """
-        self.host_site_rules = self._load_rules(host_site_rules_path)
-        self.host_tenant_rules = self._load_rules(host_tenant_rules_path)
-        self.vm_tenant_rules = self._load_rules(vm_tenant_rules_path)
-        self.vm_role_rules = self._load_rules(vm_role_rules_path)
-        self.skip_vm_rules = self._load_rules(skip_rules_path)
+        self.logger = logging.getLogger(__name__)
 
-    def _load_rules(self, path):
+    def transform_name(self, hostname):
         """
-        Load regex rules from a YAML or JSON file.
+        Transforms hostname to name without the domain and converts to lowercase.
         """
-        try:
-            with open(path, "r") as f:
-                return yaml.safe_load(f)
-        except Exception as e:
-            logging.error(f"Failed to load rules from {path}: {e}")
-            exit(1)
+        if not hostname:
+            return None
+        return hostname.lower().split(".clemson.edu")[0]
 
-    def apply_regex_replacements(self, value, rules):
-        for rule in rules:
-            # Validate rule structure
-            if len(rule) != 2:
-                logging.error(f"Malformed rule: {rule}")
-                continue
+    def transform_device_type(self, platform_id):
+        """
+        Transforms platformId to device type with replacements for Cisco Catalyst models.
+        """
+        if not platform_id:
+            return None
+        device_type = platform_id
+        replacements = [
+            (r"^C", "Catalyst "),
+            (r"^WS\-C", "Catalyst "),
+            (r"^IE\-", "Catalyst IE"),
+            (r"^AIR\-AP", "Catalyst "),
+            (r"^AIR\-CAP", "Catalyst "),
+            (r"\-K9$", ""),
+            (r"^([^\,]+)\,.+", r"\1"),
+        ]
+        for pattern, replacement in replacements:
+            device_type = self.regex_replace(device_type, pattern, replacement)
+        return {"model": device_type, "manufacturer": {"name": "Cisco"}}
 
-            pattern, replacement = rule
-            if re.match(pattern, value, flags=re.IGNORECASE):
-                return re.sub(pattern, replacement, value, flags=re.IGNORECASE)
+    def transform_role(self, role):
+        """
+        Transforms role into title case and looks up the object.
+        """
+        if not role:
+            return None
+        return role.title()
 
-        return value
+    def transform_platform(self, software_type, software_version):
+        """
+        Combines softwareType and softwareVersion into a single platform string.
+        """
+        software_type = software_type.upper() if software_type else "IOS"
+        return f"{software_type} {software_version}"
 
-    def should_skip_vm(self, vm_name):
+    def transform_site(self, site_hierarchy):
         """
-        Determines if a VM should be skipped based on the skip rules.
+        Extracts the site name from the siteNameHierarchy.
         """
-        for pattern in self.skip_vm_rules:
-            if re.match(pattern, vm_name, flags=re.IGNORECASE):
-                logging.info(f"Skipping VM: {vm_name} (matched pattern: {pattern})")
-                return True
-        return False
-    
-    def host_to_site(self, name):
-        """
-        Transform a host's cluster name to its site name.
-        """
-        return self.apply_regex_replacements(name, self.host_site_rules)
+        if not site_hierarchy:
+            return None
+        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
-    def host_to_tenant(self, name):
+    def transform_location(self, site_hierarchy):
         """
-        Transform a host's name to its tenant.
+        Extracts the location from the siteNameHierarchy.
         """
-        return self.apply_regex_replacements(name, self.host_tenant_rules)
+        if not site_hierarchy:
+            return None
+        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
-    def vm_to_tenant(self, name):
+    def transform_status(self, reachability_status):
         """
-        Transform a VM's name to its tenant.
+        Maps reachabilityStatus to device status.
         """
-        return self.apply_regex_replacements(name, self.vm_tenant_rules)
-    
-    def vm_to_role(self, name):
-        """
-        Transform a VM's name to its tenant.
-        """
-        return self.apply_regex_replacements(name, self.vm_role_rules)
+        if not reachability_status:
+            return None
+        return (
+            "active" if "Reachable" in reachability_status else
+            "offline" if "Unreachable" in reachability_status else
+            None
+        )
 
-    def clean_name(self, name):
+    def regex_replace(self, value, pattern, replacement):
         """
-        Remove '.clemson.edu.*' from a hostname or VM name.
+        Applies a regex pattern replacement to a given string value.
         """
-        return re.sub(r'\.clemson\.edu.*', '', name, flags=re.IGNORECASE)
+        return re.sub(pattern, replacement, value)

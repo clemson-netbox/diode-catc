@@ -1,25 +1,54 @@
 import logging
+from dnacentersdk import api
 
-def fetch_device_data(catc):
-    """
-    Fetches device data from Cisco DNA Center.
-    """
-    logging.info("Fetching devices from Cisco DNA Center...")
-    devices = []
-    try:
-        devices = catc.devices.get_device_list()
-    except Exception as e:
-        logging.error(f"Error fetching devices: {e}")
-    return devices
 
-def fetch_interface_data(catc, device_id):
+def fetch_data(client):
     """
-    Fetches interface data for a specific device.
+    Fetches data from Catalyst Center including sites and devices with their site associations.
     """
-    logging.info(f"Fetching interfaces for device {device_id}...")
-    interfaces = []
     try:
-        interfaces = catc.interfaces.get_interface_by_device_id(device_id=device_id)
+        devices = []
+        sites = []
+        offset = 1
+        limit = 500
+        items=0
+
+        # Fetch all sites in Catalyst Center
+        while items == limit:
+            response = client.sites.get_site(offset=offset, limit=limit)
+            sites.extend(response.response if hasattr(response, "response") else [])
+            items = len(response.response) if hasattr(response, "response") else 0
+            offset += limit
+
+        if not sites:
+            raise ValueError("No sites found in Cisco Catalyst Center.")
+
+        logging.info(f"Found {len(sites)} sites in Catalyst Center.")
+
+        # Process each site to fetch associated devices
+        items = 0
+        for site in sites:
+            items += 1
+            site_name = site.get("siteNameHierarchy")
+            logging.info(f"Processing Site #{items}: {site_name}")
+
+            # Get devices associated with the site
+            membership = client.sites.get_membership(site_id=site.id)
+            if not membership or not hasattr(membership, "device"):
+                continue
+
+            for members in (membership.device or []):
+                if not members or not hasattr(members, "response"):
+                    continue
+
+                for device in members.response:
+                    if hasattr(device, "serialNumber"):
+                        device["siteNameHierarchy"] = site_name
+                        logging.info(f"Found device {device.hostname} in site {site_name}")
+                        devices.append(device)
+
+        return devices
+
     except Exception as e:
-        logging.error(f"Error fetching interfaces for device {device_id}: {e}")
-    return interfaces
+        logging.error(f"Error fetching data from Catalyst Center: {e}")
+        raise
