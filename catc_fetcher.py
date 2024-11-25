@@ -10,11 +10,11 @@ def fetch_device_data(client):
         devices = []
         sites = []
         offset = 1
-        limit = 501
-        items = 501
+        limit = 500
+        items = 500
 
         # Fetch all sites in Catalyst Center
-        while items == limit:
+        while items > limit:
             response = client.sites.get_site(offset=offset, limit=limit)
             sites.extend(response.response if hasattr(response, "response") else [])
             items = len(response.response) if hasattr(response, "response") else 0
