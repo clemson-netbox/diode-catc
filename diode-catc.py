@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from catc_connector import connect_to_catc
 from catc_fetcher import fetch_device_data#, fetch_interface_data
-from catc_data_conversion import prepare_device_data#, prepare_interface_data
+from data_conversion import prepare_device_data#, prepare_interface_data
 from netboxlabs.diode.sdk import DiodeClient
 from version import __version__
 

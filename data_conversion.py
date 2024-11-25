@@ -1,5 +1,5 @@
 from netboxlabs.diode.sdk.ingester import Device, Entity
-from transform import Transformer
+from transformer import Transformer
 import logging
 
 def transform_device_data(devices):
