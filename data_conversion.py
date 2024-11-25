@@ -2,7 +2,7 @@ from netboxlabs.diode.sdk.ingester import Device, Entity
 from transformer import Transformer
 import logging
 
-def transform_device_data(devices):
+def prepare_device_data(devices):
     """
     Transforms Catalyst Center device data into Diode-compatible Device entities.
     """
