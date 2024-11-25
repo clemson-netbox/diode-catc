@@ -1,14 +1,10 @@
 import re
+import yaml
 import logging
 
 class Transformer:
-    def __init__(self):
-        """
-        Initialize any shared state or configurations for transformations.
-        """
-        self.logger = logging.getLogger(__name__)
 
-    def transform_name(self, hostname):
+    def transform_name(hostname):
         """
         Transforms hostname to name without the domain and converts to lowercase.
         """
@@ -16,7 +12,16 @@ class Transformer:
             return None
         return hostname.lower().split(".clemson.edu")[0]
 
-    def transform_device_type(self, platform_id):
+    # Utility function for regex replacement
+    def regex_replace(value, pattern, replacement):
+        """
+        Applies a regex pattern replacement to a given string value.
+        """
+        import re
+        return re.sub(pattern, replacement, value)
+
+
+    def transform_device_type(platform_id):
         """
         Transforms platformId to device type with replacements for Cisco Catalyst models.
         """
@@ -33,10 +38,11 @@ class Transformer:
             (r"^([^\,]+)\,.+", r"\1"),
         ]
         for pattern, replacement in replacements:
-            device_type = self.regex_replace(device_type, pattern, replacement)
+            device_type = regex_replace(device_type, pattern, replacement)
         return {"model": device_type, "manufacturer": {"name": "Cisco"}}
 
-    def transform_role(self, role):
+
+    def transform_role(role):
         """
         Transforms role into title case and looks up the object.
         """
@@ -44,30 +50,34 @@ class Transformer:
             return None
         return role.title()
 
-    def transform_platform(self, software_type, software_version):
+
+    def transform_platform(software_type, software_version):
         """
         Combines softwareType and softwareVersion into a single platform string.
         """
         software_type = software_type.upper() if software_type else "IOS"
         return f"{software_type} {software_version}"
 
-    def transform_site(self, site_hierarchy):
+
+    def transform_site(site_hierarchy):
         """
         Extracts the site name from the siteNameHierarchy.
         """
         if not site_hierarchy:
             return None
-        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
-    def transform_location(self, site_hierarchy):
+
+    def transform_location(site_hierarchy):
         """
         Extracts the location from the siteNameHierarchy.
         """
         if not site_hierarchy:
             return None
-        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
-    def transform_status(self, reachability_status):
+
+    def transform_status(reachability_status):
         """
         Maps reachabilityStatus to device status.
         """
@@ -79,8 +89,5 @@ class Transformer:
             None
         )
 
-    def regex_replace(self, value, pattern, replacement):
-        """
-        Applies a regex pattern replacement to a given string value.
-        """
-        return re.sub(pattern, replacement, value)
+
+    
