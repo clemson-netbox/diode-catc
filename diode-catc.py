@@ -28,7 +28,7 @@ def parse_arguments():
         help="Diode server address (or set via DIODE_SERVER environment variable)"
     )
     parser.add_argument(
-        "--diode-token",
+        "--diode-api-key",
         default=os.getenv("DIODE_API_KEY"),
         required=not os.getenv("DIODE_API_KEY"),
         help="Diode API token (or set via DIODE_API_KEY environment variable)"
