@@ -18,12 +18,11 @@ def fetch_device_data(client):
             response = client.sites.get_site(offset=offset, limit=limit)
             sites.extend(response.response if hasattr(response, "response") else [])
             items = len(response.response) if hasattr(response, "response") else 0
+            logging.info(f"Found {len(sites)} sites in Catalyst Center.")
             offset += limit
 
         if not sites:
             raise ValueError("No sites found in Cisco Catalyst Center.")
-
-        logging.info(f"Found {len(sites)} sites in Catalyst Center.")
 
         # Process each site to fetch associated devices
         items = 0
