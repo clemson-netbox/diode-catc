@@ -29,9 +29,9 @@ def parse_arguments():
     )
     parser.add_argument(
         "--diode-token",
-        default=os.getenv("DIODE_TOKEN"),
-        required=not os.getenv("DIODE_TOKEN"),
-        help="Diode API token (or set via DIODE_TOKEN environment variable)"
+        default=os.getenv("DIODE_API_KEY"),
+        required=not os.getenv("DIODE_API_KEY"),
+        help="Diode API token (or set via DIODE_API_KEY environment variable)"
     )
     parser.add_argument(
         "--catc-host",
