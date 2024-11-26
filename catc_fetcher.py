@@ -52,7 +52,7 @@ def fetch_device_data(client):
                     if hasattr(device, 'serialNumber'):
                         logging.info(f"Found device {device.hostname}")
                         interfaces=[]
-                        if int(device.interfaceCount) > 0:
+                        if 'family' in device and 'Unified AP' not in device.family: 
                             try:
                                 logging.info(f"Getting all interfaces for device: {device['hostname']}")
                                 interface_response = client.devices.get_interface_info_by_id(device['id'])
@@ -72,9 +72,8 @@ def fetch_device_data(client):
                                             ] if hasattr(interface, "addresses") else []
                                         })
                             except Exception as e:
-                                 logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
-                                 
-                        elif 'Unified AP' in device.family:
+                                 logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")  
+                        elif 'family' in device and 'Unified AP' in device.family:
                             logging.info(f"Getting Device {device.hostname} Access Point Interface info")
                             interfaces.append({
                                     "name": "mgmt0",
@@ -94,7 +93,7 @@ def fetch_device_data(client):
                             })
                             device.enabled=device.reachabilityStatus.lower()
                         else:
-                            logging.info(f"Device {device.name} has no interfaces")
+                            logging.info(f"Device {device.hostname} has no interfaces")
                             
                         device.site = site.name
                         device.interfaces = interfaces
