@@ -73,8 +73,11 @@ def fetch_device_data(client):
                                         })
                             except Exception as e:
                                  logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
-                        elif 'Access Point' in device.role:
+                        elif 'Unified AP' in device.family:
                             logging.info(f"Getting Device {device.name} Access Point Interface info")
+                            apEthernetMacAddress
+                            macAddress
+                            managementIpAddressvv
                         else:
                             logging.info(f"Device {device.name} has no interfaces")
                             

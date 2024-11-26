@@ -21,7 +21,7 @@ def prepare_device_data(devices):
                 name=transformer.transform_name(device.get("hostname")),
                 device_type=transformer.transform_device_type(device.get("platformId")),
                 manufacturer="Cisco",
-                role=transformer.transform_role(device.get("role")),
+                role=f"{device.get('family')} - {transformer.transform_role(device.get("role"))}",
                 platform=transformer.transform_platform(
                     device.get("softwareType"), device.get("softwareVersion")
                 ),
