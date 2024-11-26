@@ -33,7 +33,7 @@ def fetch_device_data(client):
         for site in sites:
             items += 1
             site_name = site.get("siteNameHierarchy")
-            logging.debug(f"Processing Site #{items}: {site_name}")
+            logging.info(f"Processing Site #{items}: {site_name}")
 
             # Get devices associated with the site
             membership = client.sites.get_membership(site_id=site.id)
