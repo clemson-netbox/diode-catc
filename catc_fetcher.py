@@ -16,7 +16,23 @@ def fetch_device_data(client):
         items = 501
         #limit = 10
         #items = 10
+        
+        #Fetch all devices in Catalyst Center
+        while items > limit:
+        #while items == limit:
+            response = client.devices.get_device_list(offset=offset, limit=limit)
+            devices.extend(response.response if hasattr(response, "response") else [])
+            items = len(response.response) if hasattr(response, "response") else 0
+            logging.info(f"Found {len(sites)} devices in Catalyst Center.")
+            offset += limit
 
+        if not sites:
+            raise ValueError("No devices found in Cisco Catalyst Center.")
+        
+        offset = 1
+        limit = 500
+        items = 501
+        
         # Fetch all sites in Catalyst Center
         while items > limit:
         #while items == limit:
@@ -46,9 +62,17 @@ def fetch_device_data(client):
                 if not members or not hasattr(members, "response"):
                     continue
 
-                for device in members.response:
-                    logging.info(f"{device.hostname} has {device.interfaceCount} interfaces")
+                for memberdev in members.response:
+                    for dev in devices:
+                        if dev['serialNumber'] == memberdev['serialNumber']:
+                            device=dev
+                            logging.info("found matching dev for member")
+                    
+                    if device == None:
+                        continue
+                
                     devcount += 1
+
                     if hasattr(device, "interfaceCount") and int(device.interfaceCount) > 0:
                         interface_response = client.devices.get_interface_info_by_id(device.id).response
                         interfaces=[]    
@@ -88,3 +112,8 @@ def fetch_device_data(client):
     except Exception as e:
         logging.error(f"Error fetching data from Catalyst Center: {e}")
         raise
+    
+    
+    
+    
+    
