@@ -47,11 +47,11 @@ def fetch_device_data(client):
                     continue
 
                 for device in members.response:
-                    if hasattr(device, "id"):
+                    if hasattr(device, "serialNumber"):
                         logging.info(f"Device object: {device}")
                         devcount +=1
-                        logging.info(f"Checking device ID for {device.get('hostname', 'unknown')}: {getattr(device, 'id', None)}")
-                        interface_response = client.devices.get_interface_info_by_id(device.id).response
+                        logging.info(f"Checking device ID for {device.get('hostname', 'unknown')}: {getattr(device, 'serialNumber', None)}")
+                        interface_response = client.devices.get_interface_info_by_id(device.serialNumber).response
                         interfaces=[]    
                         if interface_response:     
                             print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
