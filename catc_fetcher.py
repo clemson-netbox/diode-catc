@@ -79,8 +79,6 @@ def fetch_device_data(client):
                                 
                         device['interfaces'] = interfaces
                         devices.append(device)
-                    else:
-
                         
             logging.info(f"Fetched {devcount} Devices...")
             devcount=0    
