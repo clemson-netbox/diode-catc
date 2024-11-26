@@ -33,11 +33,11 @@ def get_sites_with_devices(client):
         site_entry = {"name": site_name, "devices": []}
         try:
             response = client.sites.get_membership(site_id=site.id)
-            print(f"{response}")
-            if not(response and hasattr(response, "response")):
+            
+            if response.device == []:
                 logging.warning(f"No devices found for site: {site_name}")
             else:
-                for member_device in response.response:
+                for member_device in response.device:
                     logging.info(f"{member_device} found for site: {site_name}")
                     site_entry["devices"].append(member_device)
         except Exception as e:
