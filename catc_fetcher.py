@@ -55,6 +55,8 @@ def fetch_device_data(client):
                         interfaces=[]
                         try:
                             interfaces_response = client.devices.get_interface_info_by_id(device.id).response
+                            if not interfaces_response: 
+                                continue
                             print(f"Fetched {len(interfaces_response)} interfaces for device {device.hostname}")
                             
                             # Process interfaces
