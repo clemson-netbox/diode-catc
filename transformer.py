@@ -20,6 +20,54 @@ class Transformer:
         import re
         return re.sub(pattern, replacement, value)
 
+    def get_cidr(ip, subnet_mask):
+        """
+        Convert IP and subnet mask into CIDR notation.
+        """
+        from ipaddress import ip_network
+        try:
+            network = ip_network(f"{ip}/{subnet_mask}", strict=False)
+            return str(network)
+        except ValueError:
+            return None
+
+    def map_duplex(duplex):
+        """
+        Map Cisco DNAC duplex values to NetBox expected values.
+        """
+        if isinstance(duplex, str):
+            if duplex.lower() in ["full", "half"]:
+                return duplex.lower()
+        elif isinstance(duplex, bool):
+            return "full" if duplex else "half"
+        return "auto"  # Default to auto if duplex is missing or unrecognized
+
+    def infer_interface_type(port_name, speed):
+        """
+        Infer interface type based on portName and speed.
+        """
+        # Mapping of speeds to physical interface types
+        speed_to_type_map = {
+            100: "100base-t",
+            1000: "1000base-t",
+            10000: "10gbase-x-sfpp",
+            25000: "25gbase-x-sfp28",
+            40000: "40gbase-x-qsfpp",
+            100000: "100gbase-x-qsfp28",
+        }
+
+        # Check if the portName indicates a virtual interface
+        if "loopback" in port_name.lower():
+            return "loopback"
+        elif "vlan" in port_name.lower():
+            return "vlan"
+        elif "tunnel" in port_name.lower():
+            return "tunnel"
+        elif "ethernet" in port_name.lower() or "gigabit" in port_name.lower():
+            # Map speed to physical interface type
+            return speed_to_type_map.get(speed, "ethernet")
+        else:
+            return "virtual"
 
     def transform_device_type(self, platform_id):
         """

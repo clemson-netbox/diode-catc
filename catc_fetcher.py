@@ -1,11 +1,13 @@
 import logging
 from dnacentersdk import api
-
+from transformer import Transformer
 
 def fetch_device_data(client):
     """
     Fetches data from Catalyst Center including sites and devices with their site associations.
     """
+    transformer=Transformer()
+    
     try:
         devices = []
         sites = []
@@ -49,7 +51,39 @@ def fetch_device_data(client):
                         device["siteNameHierarchy"] = site_name
                         #logging.info(f"Found device {device.hostname} in site {site_name}")
                         devcount +=1
+                        
+                        try:
+                            interface_response = client.devices.get_interface_info_by_id(device.id).response
+                        except Exception as e:
+                                interface_response = []
+                                
+                        if interface_response:
+                            interfaces=[]
+                            print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
+                            for interface in interface_response:
+                                ip_addresses = []
+                                if hasattr(interface, "ipv4Address"):
+                                    for ip_info in interface.ipv4Address:
+                                        ip = ip_info.ipAddress
+                                        subnet = ip_info.subnetMask
+                                        if ip and subnet:
+                                            cidr = transformer.get_cidr(ip, subnet)
+                                            if cidr:
+                                                ip_addresses.append(cidr)
+                                    #TODO: IPV6 Addresses
+                                    
+                                interfaces.append({
+                                    "name": interface.portName,
+                                    "mac": getattr(interface, "macAddress", None),
+                                    "speed": interface.speed,
+                                    "duplex": getattr(interface, "duplex", None),
+                                    "enabled": interface.status.lower(),
+                                    "ips": ip_addresses if ip_addresses else None, 
+                                })
+                                
+                        device['interfaces'] = interfaces
                         devices.append(device)
+
                         
             logging.info(f"Processed {devcount} Devices...")
             devcount=0    
