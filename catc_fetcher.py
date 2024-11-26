@@ -32,15 +32,13 @@ def get_sites_with_devices(client):
         site_name = site.get("siteNameHierarchy", "Unknown")
         site_entry = {"name": site_name, "devices": []}
         try:
-            members = client.sites.get_membership(site_id=site.id).response
-
-            if not members or not hasattr(members, "device") or not members.device:
+            response = client.sites.get_membership(site_id=site.id)
+            if not(response and hasattr(response, "response")):
                 logging.warning(f"No devices found for site: {site_name}")
-                continue
-            
-            for member_device in members.device.response:
-                logging.info(f"{member_device} found for site: {site_name}")
-                site_entry["devices"].append(member_device)
+            else:
+                for member_device in response.response.device.response:
+                    logging.info(f"{member_device} found for site: {site_name}")
+                    site_entry["devices"].append(member_device)
         except Exception as e:
             logging.error(f"Error fetching membership for site {site_name}: {e}")
 
