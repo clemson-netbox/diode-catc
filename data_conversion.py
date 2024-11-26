@@ -4,15 +4,7 @@ import logging
 
 
 def prepare_data(merged_data):
-    """
-    Transforms Catalyst Center merged data into Diode-compatible Device entities.
-
-    Args:
-        merged_data (list): Merged data containing sites, devices, and interfaces.
-
-    Returns:
-        list: A list of Diode-compatible Entity objects.
-    """
+    
     transformer = Transformer()
     entities = []
 
