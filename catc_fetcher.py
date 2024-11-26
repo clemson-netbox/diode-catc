@@ -35,7 +35,7 @@ def get_sites_with_devices(client):
             response = client.sites.get_membership(site_id=site.id)
             for members in response.device:
                 for member in members.response:
-                    logging.info(f"{member} found for site: {site_name}")
+                    logging.info(f"{member.hostname} found for site: {site_name}")
                     site_entry["devices"].append(member.response)
         except Exception as e:
             logging.error(f"Error fetching membership for site {site_name}: {e}")
