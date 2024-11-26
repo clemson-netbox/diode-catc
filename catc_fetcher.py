@@ -53,35 +53,34 @@ def fetch_device_data(client):
                 for device in members.response:
                     if hasattr(device, 'serialNumber'):
                         site_devices = []
-                        for member_device in membership.device.response:
-                            logging.info(f"Processing device: {member_device}")
-                            serial_number = member_device["serialNumber"]
-                            if serial_number and serial_number in all_devices:
-                                device_record = all_devices[serial_number]
-                                # Fetch interfaces for this device
-                                interfaces = []
-                                try:
-                                    logging.info(f"Fetching interfaces for device: {device_record['hostname']}")
-                                    interface_response = client.devices.get_interface_info_by_id(device_record.id)
-                                    if interface_response and hasattr(interface_response, "response"):
-                                        for interface in interface_response.response:
-                                            interfaces.append({
-                                                    "name": interface.portName,
-                                                    "mac": getattr(interface, "macAddress", None),
-                                                    "speed": interface.speed,
-                                                    "duplex": getattr(interface, "duplex", None),
-                                                    "enabled": interface.status.lower(),
-                                                    "ips": [
-                                                    f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
-                                                    for ip in getattr(interface, "addresses", {})
-                                                ] if hasattr(interface, "addresses") else []
-                                            })
-                                except Exception as e:
-                                    logging.error(f"Error fetching interfaces for device {device_record.hostname}: {e}")
+                        logging.info(f"Processing device: {device}")
+                        serial_number = device["serialNumber"]
+                        if serial_number and serial_number in all_devices:
+                            device_record = all_devices[serial_number]
+                            # Fetch interfaces for this device
+                            interfaces = []
+                            try:
+                                logging.info(f"Fetching interfaces for device: {device_record['hostname']}")
+                                interface_response = client.devices.get_interface_info_by_id(device_record.id)
+                                if interface_response and hasattr(interface_response, "response"):
+                                    for interface in interface_response.response:
+                                        interfaces.append({
+                                                "name": interface.portName,
+                                                "mac": getattr(interface, "macAddress", None),
+                                                "speed": interface.speed,
+                                                "duplex": getattr(interface, "duplex", None),
+                                                "enabled": interface.status.lower(),
+                                                "ips": [
+                                                f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
+                                                for ip in getattr(interface, "addresses", {})
+                                            ] if hasattr(interface, "addresses") else []
+                                        })
+                            except Exception as e:
+                                logging.error(f"Error fetching interfaces for device {device_record.hostname}: {e}")
 
-                                # Add interfaces to the device record
-                                device_record.interfaces = interfaces
-                                site_devices.append(device_record)
+                            device_record.site=site_name
+                            device_record.interfaces = interfaces
+                            site_devices.append(device_record)
 
             site_device_map[site_name] = site_devices
             logging.info(f"Completed processing site: {site_name}")
