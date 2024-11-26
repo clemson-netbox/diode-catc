@@ -49,9 +49,9 @@ def fetch_device_data(client):
             logging.info(f"Found {len(membership.device)} devices.")
 
             site_devices = []
-            for member_device in membership.device.response:
+            for member_device in membership.device:
                 logging.info(f"Processing device: {member_device['hostname']}")
-                serial_number = member_device.get("serialNumber")
+                serial_number = member_device.response.get("serialNumber")
                 if serial_number and serial_number in all_devices:
                     device_record = all_devices[serial_number]
                     logging.info(f"Found device: {device_record.hostname}")
