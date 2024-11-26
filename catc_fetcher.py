@@ -43,15 +43,15 @@ def fetch_device_data(client):
                         if interface_response and hasattr(interface_response, "response"):
                             for interface in interface_response.response:
                                 interfaces.append({
-                                    "name": interface.portName,
-                                    "macAddress": interface.macAddress,
-                                    "speed": interface.speed * 1000 if hasattr(interface, "speed") else None,
-                                    "type": interface.interfaceType if hasattr(interface, "interfaceType") else None,
-                                    "status": interface.status if hasattr(interface, "status") else "unknown",
-                                    "ips": [
-                                        f"{ip.ipAddress}/{ip.prefixLength}" 
-                                        for ip in getattr(interface, "ipConfig", {}).get("ipAddress", [])
-                                    ] if hasattr(interface, "ipConfig") else []
+                                        "name": interface.portName,
+                                        "mac": getattr(interface, "macAddress", None),
+                                        "speed": interface.speed,
+                                        "duplex": getattr(interface, "duplex", None),
+                                        "enabled": interface.status.lower(),
+                                        "ips": [
+                                        f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
+                                        for ip in getattr(interface, "addresses", {})
+                                    ] if hasattr(interface, "addresses") else []
                                 })
                     except Exception as e:
                         logging.error(f"Error fetching interfaces for device {device_record.hostname}: {e}")
@@ -69,3 +69,23 @@ def fetch_device_data(client):
     except Exception as e:
         logging.error(f"Error fetching data from Catalyst Center: {e}")
         raise
+
+    
+    
+    #    for ip_info in interface.ipv4Address:
+    #         ip = ip_info.ipAddress
+    #         subnet = ip_info.subnetMask
+    #         if ip and subnet:
+    #             cidr = transformer.get_cidr(ip, subnet)
+    #             if cidr:
+    #                 ip_addresses.append(cidr)
+    #     #TODO: IPV6 Addresses
+        
+    interfaces.append({
+         "name": interface.portName,
+         "mac": getattr(interface, "macAddress", None),
+         "speed": interface.speed,
+         "duplex": getattr(interface, "duplex", None),
+         "enabled": interface.status.lower(),
+         "ips": ip_addresses if ip_addresses else None, 
+     })
