@@ -14,8 +14,8 @@ def fetch_device_data(client):
         offset = 1
         #limit = 500
         #items = 501
-        limit = 5
-        items = 5
+        limit = 10
+        items = 10
 
         # Fetch all sites in Catalyst Center
         #while items > limit:
@@ -47,11 +47,9 @@ def fetch_device_data(client):
                     continue
 
                 for device in members.response:
-                    if hasattr(device, "instanceUuid"):
+                    if hasattr(device, "id"):
                         devcount += 1
-                        logging.info(f"device: {device} site: {site}")
-                        logging.info(f"Checking device ID for {device.get('hostname', 'unknown')}: {getattr(device, 'instanceUuid', None)}")
-                        interface_response = client.devices.get_interface_info_by_id(device.instanceUuid).response
+                        interface_response = client.devices.get_interface_info_by_id(device.id).response
                         interfaces=[]    
                         if interface_response:     
                             print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
