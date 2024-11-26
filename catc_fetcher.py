@@ -17,10 +17,11 @@ def fetch_device_data(client):
             if len(response.response) < limit:
                 break  # Last page
             offset += limit
-            logging.info(f"found {devices_response.device.hostname} = {devices_response.device.serialNumber}")
         all_devices = {
             device.serialNumber: device for device in devices_response if hasattr(device, "serialNumber")
         }
+        logging.info(f"found {device.hostname} = {device.serialNumber}" for device in devices_response if hasattr(device, "serialNumber"))
+
         logging.info(f"Fetched {len(all_devices)} devices.")
 
         logging.info("Fetching all sites from Catalyst Center...")
