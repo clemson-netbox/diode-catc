@@ -37,11 +37,10 @@ def get_sites_with_devices(client):
             if len(response.device) == 1:
                 logging.warning(f"No devices found for site: {site_name}")
             else:
-                for member_device in response.device:
-                    if member_device == []:
-                        continue
-                    logging.info(f"{member_device} found for site: {site_name}")
-                    site_entry["devices"].append(member_device)
+                for members in response.device:
+                    for member in members.response:
+                        logging.info(f"{member} found for site: {site_name}")
+                        site_entry["devices"].append(member.response)
         except Exception as e:
             logging.error(f"Error fetching membership for site {site_name}: {e}")
 
