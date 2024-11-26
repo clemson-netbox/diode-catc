@@ -50,7 +50,7 @@ def fetch_device_data(client):
                 if not members or not hasattr(members, 'response'): continue
                 for device in members.response:
                     if hasattr(device, 'serialNumber'):
-                        logging.info(f"Found device {device.hostname}: {device}")
+                        logging.info(f"Found device {device.hostname}")
                         interfaces={}
                         if device.interfaceCount > 0:
                             try:
