@@ -18,15 +18,15 @@ def fetch_device_data(client):
         #items = 10
         
         #Fetch all devices in Catalyst Center
-        while items > limit:
-        #while items == limit:
+        #while items > limit:
+        while items == limit:
             response = client.devices.get_device_list(offset=offset, limit=limit)
             devices.extend(response.response if hasattr(response, "response") else [])
             items = len(response.response) if hasattr(response, "response") else 0
             logging.info(f"Found {len(devices)} devices in Catalyst Center.")
             offset += limit
 
-        if not sites:
+        if not devices:
             raise ValueError("No devices found in Cisco Catalyst Center.")
         
         offset = 1
@@ -34,8 +34,8 @@ def fetch_device_data(client):
         items = 501
         
         # Fetch all sites in Catalyst Center
-        while items > limit:
-        #while items == limit:
+        #while items > limit:
+        while items == limit:
             response = client.sites.get_site(offset=offset, limit=limit)
             sites.extend(response.response if hasattr(response, "response") else [])
             items = len(response.response) if hasattr(response, "response") else 0
