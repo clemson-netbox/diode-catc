@@ -52,9 +52,10 @@ def fetch_device_data(client):
             for member_device in membership.device:
                 logging.info(f"Processing device: {member_device['hostname']}")
                 serial_number = member_device.response.get("serialNumber")
+                logging.info(f"Serial: {serial_number}")
                 if serial_number and serial_number in all_devices:
                     device_record = all_devices[serial_number]
-                    logging.info(f"Found device: {device_record.response}")
+                    logging.info(f"Found device: {serial_number}")
 
                     # Fetch interfaces for this device
                     interfaces = []
