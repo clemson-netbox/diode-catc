@@ -6,7 +6,7 @@ def get_paginated_objects(client, fetch_method, object_name, limit=500):
     results = []
     offset = 1
 
-    while True:
+    while True if not 'site' in object_name else offset < 10:
         try:
             response = fetch_method(offset=offset, limit=limit)
             if not response or not hasattr(response, "response"):
