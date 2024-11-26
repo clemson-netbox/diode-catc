@@ -56,9 +56,8 @@ def fetch_device_data(client):
                             interface_response = client.devices.get_interface_info_by_id(device.id).response
                         except Exception as e:
                                 interface_response = []
-                                
-                        if interface_response:
-                            interfaces=[]
+                        interfaces=[]    
+                        if interface_response:     
                             print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
                             for interface in interface_response:
                                 ip_addresses = []

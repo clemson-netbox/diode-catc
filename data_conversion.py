@@ -29,7 +29,7 @@ def prepare_device_data(devices):
             )
             entities.append(Entity(device=device_data))
             
-            for interface in device.interfaces:
+            for interface in device.get('interfaces'):
                 interface_data = Interface(
                     name=interface.portName,
                     mac=interface.macAddress,
