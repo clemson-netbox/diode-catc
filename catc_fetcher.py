@@ -47,15 +47,10 @@ def fetch_device_data(client):
                     continue
 
                 for device in members.response:
-                    if hasattr(device, "serialNumber"):
-                        device["siteNameHierarchy"] = site_name
-                        #logging.info(f"Found device {device.hostname} in site {site_name}")
+                    if hasattr(device, "id"):
                         devcount +=1
-                        
-                        try:
-                            interface_response = client.devices.get_interface_info_by_id(device.id).response
-                        except Exception as e:
-                                interface_response = []
+                        logging.info(f"Checking device ID for {device.get('hostname', 'unknown')}: {getattr(device, 'id', None)}")
+                        interface_response = client.devices.get_interface_info_by_id(device.id).response
                         interfaces=[]    
                         if interface_response:     
                             print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
