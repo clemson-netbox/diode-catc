@@ -33,6 +33,7 @@ def get_sites_with_devices(client):
         site_entry = {"name": site_name, "devices": []}
         try:
             response = client.sites.get_membership(site_id=site.id)
+            print(f"{response}")
             if not(response and hasattr(response, "response")):
                 logging.warning(f"No devices found for site: {site_name}")
             else:
