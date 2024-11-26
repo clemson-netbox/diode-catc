@@ -4,7 +4,7 @@ import logging
 
 class Transformer:
 
-    def transform_name(hostname):
+    def transform_name(self,hostname):
         """
         Transforms hostname to name without the domain and converts to lowercase.
         """
@@ -13,7 +13,7 @@ class Transformer:
         return hostname.lower().split(".clemson.edu")[0]
 
     # Utility function for regex replacement
-    def regex_replace(value, pattern, replacement):
+    def regex_replace(vself, alue, pattern, replacement):
         """
         Applies a regex pattern replacement to a given string value.
         """
@@ -21,7 +21,7 @@ class Transformer:
         return re.sub(pattern, replacement, value)
 
 
-    def transform_device_type(platform_id):
+    def transform_device_type(self, platform_id):
         """
         Transforms platformId to device type with replacements for Cisco Catalyst models.
         """
@@ -42,7 +42,7 @@ class Transformer:
         return {"model": device_type, "manufacturer": {"name": "Cisco"}}
 
 
-    def transform_role(role):
+    def transform_role(self, role):
         """
         Transforms role into title case and looks up the object.
         """
@@ -51,7 +51,7 @@ class Transformer:
         return role.title()
 
 
-    def transform_platform(software_type, software_version):
+    def transform_platform(self, software_type, software_version):
         """
         Combines softwareType and softwareVersion into a single platform string.
         """
@@ -68,7 +68,7 @@ class Transformer:
         return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
 
-    def transform_location(site_hierarchy):
+    def transform_location(self,site_hierarchy):
         """
         Extracts the location from the siteNameHierarchy.
         """
@@ -77,7 +77,7 @@ class Transformer:
         return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
 
-    def transform_status(reachability_status):
+    def transform_status(self,reachability_status):
         """
         Maps reachabilityStatus to device status.
         """
