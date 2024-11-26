@@ -16,6 +16,8 @@ def prepare_device_data(devices):
             location = transformer.transform_location(device.get("siteNameHierarchy"))
             if len(location) < 1:
                 location = transformer.transform_site(device.get("siteNameHierarchy"))
+            if device.snmpLocation:
+                location=device.snmpLocation
 
             device_data = Device(
                 name=transformer.transform_name(device.get("hostname")),
@@ -27,6 +29,7 @@ def prepare_device_data(devices):
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
                 site=transformer.transform_site(device.get("siteNameHierarchy")),
+                #location=location, #TODO: uncomment when diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
                 tags=["Diode-CATC-Agent"],
             )

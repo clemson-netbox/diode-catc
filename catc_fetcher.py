@@ -52,7 +52,7 @@ def fetch_device_data(client):
                     if hasattr(device, 'serialNumber'):
                         logging.info(f"Found device {device.hostname}")
                         interfaces={}
-                        if device.interfaceCount > 0:
+                        if int(device.interfaceCount) > 0:
                             try:
                                 logging.info(f"Getting all interfaces for device: {device['hostname']}")
                                 interface_response = client.devices.get_interface_info_by_id(device['id'])
