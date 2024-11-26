@@ -47,7 +47,7 @@ def get_sites_with_devices(client):
 def get_device_details(client):
 
     devices = get_paginated_objects(client, client.devices.get_device_list, "devices")
-    return {device.serialNumber: device for device in devices if hasattr(device, "serialNumber")}
+    return {device.serialNumber: device for device in devices.response if hasattr(device.response, "serialNumber")}
 
 def get_interfaces(client, device_id):
     """

@@ -39,6 +39,39 @@ def prepare_data(merged_data):
                 logging.info(f"Processed device: {device_data.name}")
 
                 # Process interfaces for the device
+                if 'Unified AP' in device['family']:
+                    interface_data = Interface(
+                            name='mgm0t',
+                            mac=device.get("macAddress"),
+                            device=device, 
+                            description=interface.get("AP Mgmt Interface"),
+                            type="1000base-t",
+                            speed=1000000, 
+                            duplex='full',
+                            enabled=True,
+                            tags=["Diode-CATC-Agent"],
+                        )
+                    entities.append(Entity(interface=interface_data))
+                    ip_data = IPAddress(
+                        address=device['managementIpAddress'],
+                        interface=interface_data,
+                        description=f"{device_data.name} mgmt0",
+                        tags=["Diode-CATC-Agent"],
+                    )
+                    entities.append(Entity(ip_address=ip_data))
+                    logging.info(f"Processed interface: mgmt0")
+
+                    interface_data = Interface(
+                            name='radio0',
+                            device=device, 
+                            mac=device.get("apEthernetMacAddress"),
+                            description=interface.get("AP Radio"),
+                            type='wireless',
+                            enabled=True,
+                            tags=["Diode-CATC-Agent"],
+                        )
+                    entities.append(Entity(interface=interface_data))
+                    logging.info(f"Processed interface: ap0")
                 for interface in device.get("interfaces", []):
                     try:
                         interface_data = Interface(
