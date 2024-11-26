@@ -48,7 +48,8 @@ def fetch_device_data(client):
 
                 for device in members.response:
                     if hasattr(device, "instanceUuid"):
-                        devcount +=1
+                        devcount += 1
+                        logging.info(f"device: {device} site: {site}")
                         logging.info(f"Checking device ID for {device.get('hostname', 'unknown')}: {getattr(device, 'instanceUuid', None)}")
                         interface_response = client.devices.get_interface_info_by_id(device.instanceUuid).response
                         interfaces=[]    
