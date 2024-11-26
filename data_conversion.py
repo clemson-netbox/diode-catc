@@ -33,7 +33,7 @@ def prepare_device_data(devices):
                 tags=["Diode-CATC-Agent"],
             )
             entities.append(Entity(device=device_data))
-            logging.info(f"Transformed device: {device_data.name}")
+            logging.info(f"Processed device: {device_data.name}")
 
             # Process interfaces for the device
             for interface in device.get("interfaces", []):
@@ -52,7 +52,7 @@ def prepare_device_data(devices):
                         tags=["Diode-CATC-Agent"],
                     )
                     entities.append(Entity(interface=interface_data))
-                    logging.info(f"Transformed interface: {interface_data.name}")
+                    logging.info(f"Processed interface: {interface_data.name}")
 
                     # Process IPs for the interface
                     for ip in interface.get("ips", []):
@@ -65,18 +65,18 @@ def prepare_device_data(devices):
                                 tags=["Diode-CATC-Agent"],
                             )
                             entities.append(Entity(ip_address=ip_data))
-                            logging.info(f"Transformed IP: {ip}")
+                            logging.info(f"Processed IP: {ip}")
                         except Exception as ip_error:
-                            logging.error(f"Error transforming IP {ip}: {ip_error}")
+                            logging.error(f"Error processing IP {ip}: {ip_error}")
 
                 except Exception as interface_error:
                     logging.error(
-                        f"Error transforming interface {interface.get('portName', 'unknown')}: {interface_error}"
+                        f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                     )
 
         except Exception as device_error:
             logging.error(
-                f"Error transforming device {device.get('hostname', 'unknown')}: {device_error}"
+                f"Error processing device {device.get('hostname', 'unknown')}: {device_error}"
             )
 
     logging.info(f"Completed transformation for {len(devices)} devices.")

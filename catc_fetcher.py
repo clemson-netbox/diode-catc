@@ -35,7 +35,7 @@ def fetch_device_data(client):
         for site in sites:
             items += 1
             site_name = site.get("siteNameHierarchy")
-            logging.info(f"Processing Site #{items}: {site_name}")
+            logging.info(f"Fetching Site #{items}: {site_name}")
 
             # Get devices associated with the site
             membership = client.sites.get_membership(site_id=site.id)
@@ -84,7 +84,7 @@ def fetch_device_data(client):
                         devices.append(device)
 
                         
-            logging.info(f"Processed {devcount} Devices...")
+            logging.info(f"Fetched {devcount} Devices...")
             devcount=0    
             
         return devices
