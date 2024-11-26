@@ -13,7 +13,7 @@ class Transformer:
         return hostname.lower().split(".clemson.edu")[0]
 
     # Utility function for regex replacement
-    def regex_replace(self, pattern, replacement):
+    def regex_replace(self, value, pattern, replacement):
         """
         Applies a regex pattern replacement to a given string value.
         """
