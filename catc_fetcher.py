@@ -54,7 +54,7 @@ def fetch_device_data(client):
                         interfaces={}
                         if device.interfaceCount > 0:
                             try:
-                                logging.info(f"Fetching interfaces for device: {device['hostname']}")
+                                logging.info(f"Getting all interfaces for device: {device['hostname']}")
                                 interface_response = client.devices.get_interface_info_by_id(device['id'])
                                 if interface_response and hasattr(interface_response, "response"):
                                     for interface in interface_response.response:
@@ -73,8 +73,10 @@ def fetch_device_data(client):
                                         })
                             except Exception as e:
                                  logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
+                        elif 'Access Point' in device.role:
+                            logging.info(f"Getting Device {device.name} Access Point Interface info")
                         else:
-                            logging.info(f"Device {device.name}has no interfaces")
+                            logging.info(f"Device {device.name} has no interfaces")
                             
                         device.site = site.name
                         device.interfaces = interfaces

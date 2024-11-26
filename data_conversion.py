@@ -40,12 +40,14 @@ def prepare_device_data(devices):
                     interface_data = Interface(
                         name=interface.get("portName"),
                         mac=interface.get("macAddress"),
+                        description=interface.description,
                         type=transformer.infer_interface_type(
                             interface.get("portName"), interface.get("speed")
                         ),
                         speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
                         duplex=transformer.map_duplex(interface.get("duplex")),
                         enabled=interface.get("status", "").lower() in ["connected", "up"],
+                        mtu=interface.mtu if interface.mtu else None,
                         tags=["Diode-CATC-Agent"],
                     )
                     entities.append(Entity(interface=interface_data))
@@ -57,7 +59,7 @@ def prepare_device_data(devices):
                             ip_data = IPAddress(
                                 address=ip,
                                 interface=interface_data,
-                                description=f"{transformer.transform_name(device.get('hostname'))} {interface.get('portName')}",
+                                description=f"{transformer.transform_name(device.get('hostname'))} {interface.get('portName')} {interface.description}",
                                 tags=["Diode-CATC-Agent"],
                             )
                             entities.append(Entity(ip_address=ip_data))
