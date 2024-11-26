@@ -2,6 +2,7 @@ from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Entity
 from transformer import Transformer
 import logging
 
+
 def prepare_device_data(devices):
     """
     Transforms Catalyst Center device data into Diode-compatible Device entities.
@@ -11,46 +12,72 @@ def prepare_device_data(devices):
 
     for device in devices:
         try:
-            # Use the Transformer class to handle field transformations
+            logging.info(f"Processing device: {device.get('hostname', 'unknown')}")
+
+            # Transform device fields
             location = transformer.transform_location(device.get("siteNameHierarchy"))
-            if len(location)<1 : location=transformer.transform_site(device.get("siteNameHierarchy"))
-            
+            if len(location) < 1:
+                location = transformer.transform_site(device.get("siteNameHierarchy"))
+
             device_data = Device(
                 name=transformer.transform_name(device.get("hostname")),
                 device_type=transformer.transform_device_type(device.get("platformId")),
                 manufacturer="Cisco",
                 role=transformer.transform_role(device.get("role")),
-                platform=transformer.transform_platform(device.get("softwareType"), device.get("softwareVersion")),
+                platform=transformer.transform_platform(
+                    device.get("softwareType"), device.get("softwareVersion")
+                ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
                 site=transformer.transform_site(device.get("siteNameHierarchy")),
-                #location=location,
                 status=transformer.transform_status(device.get("reachabilityStatus")),
                 tags=["Diode-CATC-Agent"],
             )
             entities.append(Entity(device=device_data))
-            
-            for interface in device.get('interfaces'):
-                interface_data = Interface(
-                    name=interface.portName,
-                    mac=interface.macAddress,
-                    type=transformer.infer_interface_type(interface.portName, interface.speed),
-                    speed=interface.speed * 1000,
-                    duplex=transformer.map_duplex(interface.duplex),
-                    enabled=interface.enabled in ["connected", "up"],
-                    tags=["Diode-CATC-Agent"],
-                )
-                entities.append(Entity(interface=interface_data))
-                
-                for ip in interface.ips:
-                    ip_data = IPAddress(
-                        adddress=ip,
-                        interface=interface_data,
-                        description=f"{transformer.transform_name(device.get("hostname"))} {interface.portName}",
-                        tags=["Diode-vCenter-Agent"],
+            logging.info(f"Transformed device: {device_data.name}")
+
+            # Process interfaces for the device
+            for interface in device.get("interfaces", []):
+                try:
+                    logging.info(f"Processing interface: {interface.get('portName', 'unknown')}")
+
+                    interface_data = Interface(
+                        name=interface.get("portName"),
+                        mac=interface.get("macAddress"),
+                        type=transformer.infer_interface_type(
+                            interface.get("portName"), interface.get("speed")
+                        ),
+                        speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
+                        duplex=transformer.map_duplex(interface.get("duplex")),
+                        enabled=interface.get("status", "").lower() in ["connected", "up"],
+                        tags=["Diode-CATC-Agent"],
                     )
-                    entities.append(Entity(ip_address=ip_data))
+                    entities.append(Entity(interface=interface_data))
+                    logging.info(f"Transformed interface: {interface_data.name}")
 
-        except Exception as e:
-            logging.error(f"Error transforming device {device.get('hostname', 'unknown')}: {e}")
+                    # Process IPs for the interface
+                    for ip in interface.get("ips", []):
+                        try:
+                            logging.info(f"Processing IP: {ip}")
+                            ip_data = IPAddress(
+                                address=ip,
+                                interface=interface_data,
+                                description=f"{transformer.transform_name(device.get('hostname'))} {interface.get('portName')}",
+                                tags=["Diode-CATC-Agent"],
+                            )
+                            entities.append(Entity(ip_address=ip_data))
+                            logging.info(f"Transformed IP: {ip}")
+                        except Exception as ip_error:
+                            logging.error(f"Error transforming IP {ip}: {ip_error}")
 
+                except Exception as interface_error:
+                    logging.error(
+                        f"Error transforming interface {interface.get('portName', 'unknown')}: {interface_error}"
+                    )
+
+        except Exception as device_error:
+            logging.error(
+                f"Error transforming device {device.get('hostname', 'unknown')}: {device_error}"
+            )
+
+    logging.info(f"Completed transformation for {len(devices)} devices.")
     return entities
