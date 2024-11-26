@@ -61,7 +61,7 @@ def fetch_device_data(client):
                                 # Fetch interfaces for this device
                                 interfaces = []
                                 try:
-                                    logging.info(f"Fetching interfaces for device: {device_record.response.hostname}")
+                                    logging.info(f"Fetching interfaces for device: {device_record['hostname']}")
                                     interface_response = client.devices.get_interface_info_by_id(device_record.id)
                                     if interface_response and hasattr(interface_response, "response"):
                                         for interface in interface_response.response:
