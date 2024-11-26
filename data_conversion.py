@@ -46,7 +46,7 @@ def prepare_device_data(devices):
                         ),
                         speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
                         duplex=transformer.map_duplex(interface.get("duplex")),
-                        enabled=interface.get("status", "").lower() in ["connected", "up"],
+                        enabled=interface.get("status", "").lower() in ["connected", "up", "reachable"],
                         mtu=interface.mtu if interface.mtu else None,
                         tags=["Diode-CATC-Agent"],
                     )

@@ -91,6 +91,7 @@ def fetch_device_data(client):
                                     "enabled": "up",
                                     "ips": [],
                             })
+                            device.enabled=device.reachabilityStatus.lower()
                         else:
                             logging.info(f"Device {device.name} has no interfaces")
                             
