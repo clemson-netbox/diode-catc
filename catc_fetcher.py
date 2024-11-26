@@ -23,67 +23,61 @@ def fetch_device_data(client):
         logging.info(f"Fetched {len(all_devices)} devices.")
 
         logging.info("Fetching all sites from Catalyst Center...")
-        sites_response = []
+        sites = []
         offset = 1
         while True:
             response = client.sites.get_site(offset=offset, limit=limit)
             if not response or not hasattr(response, "response"):
                 break
-            sites_response.extend(response.response)
+            sites.extend(response.response)
             if len(response.response) < limit:
                 break  # Last page
             offset += limit
-        logging.info(f"Fetched {len(sites_response)} sites.")
-
-        site_device_map = {}
-
-        for site in sites_response:
-            site_name = site.get("siteNameHierarchy", "Unknown")
-            logging.info(f"Processing site: {site_name}")
-
+        logging.info(f"Fetched {len(sites)} sites.")
+        
+        logging.info("Linking Devices to Sites")
+        devices = {}
+        site_num = 0
+        for site in sites:
+            site_num += 1
+            logging.info(f"Working on Site #{site_num}: {site.get('siteNameHierarchy')}")
             membership = client.sites.get_membership(site_id=site.id)
-            logging.info(f"Found {len(membership.device)} devices.")
             if not membership or not hasattr(membership, 'device'): continue
             if membership.device is None: continue
             for members in membership.device:
                 if not members or not hasattr(members, 'response'): continue
-                for device in members.response:
-                    if hasattr(device, 'serialNumber'):
-                        site_devices = []
-                        logging.info(f"Processing device: {device}")
-                        serial_number = device["serialNumber"]
-                        if serial_number and serial_number in all_devices:
-                            device_record = all_devices[serial_number]
-                            # Fetch interfaces for this device
-                            interfaces = []
-                            try:
-                                logging.info(f"Fetching interfaces for device: {device_record['hostname']}")
-                                interface_response = client.devices.get_interface_info_by_id(device_record.id)
-                                if interface_response and hasattr(interface_response, "response"):
-                                    for interface in interface_response.response:
-                                        interfaces.append({
-                                                "name": interface.portName,
-                                                "mac": getattr(interface, "macAddress", None),
-                                                "speed": interface.speed,
-                                                "duplex": getattr(interface, "duplex", None),
-                                                "enabled": interface.status.lower(),
-                                                "ips": [
-                                                f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
-                                                for ip in getattr(interface, "addresses", {})
-                                            ] if hasattr(interface, "addresses") else []
-                                        })
-                            except Exception as e:
-                                logging.error(f"Error fetching interfaces for device {device_record.hostname}: {e}")
+                for member_device in members.response:
+                    if hasattr(member_device, 'serialNumber'):
+                        device=all_devices[member_device.serialNumber] 
+                        logging.info(f"Found device {device.hostname}")
+                        try:
+                            interfaces={}
+                            logging.info(f"Fetching interfaces for device: {device['hostname']}")
+                            interface_response = client.devices.get_interface_info_by_id(device['id'])
+                            if interface_response and hasattr(interface_response, "response"):
+                                for interface in interface_response.response:
+                                    interfaces.append({
+                                            "name": interface.portName,
+                                            "mac": getattr(interface, "macAddress", None),
+                                            "speed": interface.speed,
+                                            "duplex": getattr(interface, "duplex", None),
+                                            "enabled": interface.status.lower(),
+                                            "ips": [
+                                            f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
+                                            for ip in getattr(interface, "addresses", {})
+                                        ] if hasattr(interface, "addresses") else []
+                                    })
+                        except Exception as e:
+                            logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
 
-                            device_record.site=site_name
-                            device_record.interfaces = interfaces
-                            site_devices.append(device_record)
+                        device.site = site.name
+                        device.interfaces = interfaces
+                        devices.append(device)
 
-            site_device_map[site_name] = site_devices
-            logging.info(f"Completed processing site: {site_name}")
+            logging.info(f"Completed processing site: {site.name}")
 
         logging.info("Completed fetching device data.")
-        return site_device_map
+        return devices
 
     except Exception as e:
         logging.error(f"Error fetching data from Catalyst Center: {e}")
