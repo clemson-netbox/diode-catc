@@ -55,8 +55,10 @@ def fetch_device_data(client):
                         if interface_response:     
                             print(f"Fetched {len(interface_response)} interfaces for device {device['name']}")
                             for interface in interface_response:
+                                logging.info(f"Interface Object: {interface}")
                                 ip_addresses = []
                                 if hasattr(interface, "ipv4Address"):
+                                    logging.info(f"IP info: {interface.ipv4Address}")
                                     for ip_info in interface.ipv4Address:
                                         ip = ip_info.ipAddress
                                         subnet = ip_info.subnetMask
