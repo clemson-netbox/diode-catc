@@ -47,7 +47,8 @@ def fetch_device_data(client):
                     continue
 
                 for device in members.response:
-                    if hasattr(device, "id"):
+                    logging.info(f"{device.name} has {device.interfaceCount} interfaces")
+                    if hasattr(device, "interfaceCount") and device.interfaceCount > 0:
                         devcount += 1
                         interface_response = client.devices.get_interface_info_by_id(device.id).response
                         interfaces=[]    
@@ -78,6 +79,7 @@ def fetch_device_data(client):
                                 
                         device['interfaces'] = interfaces
                         devices.append(device)
+                    else:
 
                         
             logging.info(f"Fetched {devcount} Devices...")
