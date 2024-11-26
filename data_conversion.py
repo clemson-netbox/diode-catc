@@ -3,7 +3,7 @@ from transformer import Transformer
 import logging
 
 
-def prepare_device_data(merged_data):
+def prepare_data(merged_data):
     """
     Transforms Catalyst Center merged data into Diode-compatible Device entities.
 
