@@ -38,7 +38,7 @@ def fetch_device_data(client):
         logging.info(f"Fetched {len(sites)} sites.")
         
         logging.info("Linking Devices to Sites")
-        devices = {}
+        devices = []
         site_num = 0
         for site in sites:
             site_num += 1
@@ -52,26 +52,30 @@ def fetch_device_data(client):
                     if hasattr(device, 'serialNumber'):
                         logging.info(f"Found device {device.hostname}: {device}")
                         interfaces={}
-                        # if device.interfaceCount > 0:
-                        #     try:
-                        #         logging.info(f"Fetching interfaces for device: {device['hostname']}")
-                        #         interface_response = client.devices.get_interface_info_by_id(device['id'])
-                        #         if interface_response and hasattr(interface_response, "response"):
-                        #             for interface in interface_response.response:
-                        #                 interfaces.append({
-                        #                         "name": interface.portName,
-                        #                         "mac": getattr(interface, "macAddress", None),
-                        #                         "speed": interface.speed,
-                        #                         "duplex": getattr(interface, "duplex", None),
-                        #                         "enabled": interface.status.lower(),
-                        #                         "ips": [
-                        #                         f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
-                        #                         for ip in getattr(interface, "addresses", {})
-                        #                     ] if hasattr(interface, "addresses") else []
-                        #                 })
-                        #     except Exception as e:
-                        #          logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
-
+                        if device.interfaceCount > 0:
+                            try:
+                                logging.info(f"Fetching interfaces for device: {device['hostname']}")
+                                interface_response = client.devices.get_interface_info_by_id(device['id'])
+                                if interface_response and hasattr(interface_response, "response"):
+                                    for interface in interface_response.response:
+                                        interfaces.append({
+                                                "name": interface.portName,
+                                                "mac": getattr(interface, "macAddress", None),
+                                                "speed": interface.speed,
+                                                "duplex": getattr(interface, "duplex", None),
+                                                "enabled": interface.status.lower(),
+                                                "mtu": interface.mtu,
+                                                "description": interface.description,
+                                                "ips": [
+                                                f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
+                                                for ip in getattr(interface, "addresses", {})
+                                            ] if hasattr(interface, "addresses") else []
+                                        })
+                            except Exception as e:
+                                 logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
+                        else:
+                            logging.info(f"Device {device.name}has no interfaces")
+                            
                         device.site = site.name
                         device.interfaces = interfaces
                         devices.append(device)
