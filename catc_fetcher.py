@@ -23,7 +23,7 @@ def fetch_device_data(client):
             response = client.devices.get_device_list(offset=offset, limit=limit)
             devices.extend(response.response if hasattr(response, "response") else [])
             items = len(response.response) if hasattr(response, "response") else 0
-            logging.info(f"Found {len(sites)} devices in Catalyst Center.")
+            logging.info(f"Found {len(devices)} devices in Catalyst Center.")
             offset += limit
 
         if not sites:
