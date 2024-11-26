@@ -29,10 +29,11 @@ def fetch_device_data(client):
 
         # Process each site to fetch associated devices
         items = 0
+        devcount = 0    
         for site in sites:
             items += 1
             site_name = site.get("siteNameHierarchy")
-            logging.info(f"Processing Site #{items}: {site_name}")
+            logging.debug(f"Processing Site #{items}: {site_name}")
 
             # Get devices associated with the site
             membership = client.sites.get_membership(site_id=site.id)
@@ -46,9 +47,13 @@ def fetch_device_data(client):
                 for device in members.response:
                     if hasattr(device, "serialNumber"):
                         device["siteNameHierarchy"] = site_name
-                        logging.info(f"Found device {device.hostname} in site {site_name}")
+                        #logging.info(f"Found device {device.hostname} in site {site_name}")
+                        devcount +=1
                         devices.append(device)
-
+                        
+            logging.info(f"Processed {devcount} Devices...")
+            devcount=0    
+            
         return devices
 
     except Exception as e:

@@ -13,7 +13,7 @@ class Transformer:
         return hostname.lower().split(".clemson.edu")[0]
 
     # Utility function for regex replacement
-    def regex_replace(vself, alue, pattern, replacement):
+    def regex_replace(self, pattern, replacement):
         """
         Applies a regex pattern replacement to a given string value.
         """
@@ -38,7 +38,7 @@ class Transformer:
             (r"^([^\,]+)\,.+", r"\1"),
         ]
         for pattern, replacement in replacements:
-            device_type = regex_replace(device_type, pattern, replacement)
+            device_type = self.regex_replace(device_type, pattern, replacement)
         return {"model": device_type, "manufacturer": {"name": "Cisco"}}
 
 
@@ -59,13 +59,13 @@ class Transformer:
         return f"{software_type} {software_version}"
 
 
-    def transform_site(site_hierarchy):
+    def transform_site(self,site_hierarchy):
         """
         Extracts the site name from the siteNameHierarchy.
         """
         if not site_hierarchy:
             return None
-        return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
 
     def transform_location(self,site_hierarchy):
@@ -74,7 +74,7 @@ class Transformer:
         """
         if not site_hierarchy:
             return None
-        return regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
 
 
     def transform_status(self,reachability_status):
