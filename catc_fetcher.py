@@ -51,49 +51,47 @@ def fetch_device_data(client):
                 for device in members.response:
                     if hasattr(device, 'serialNumber'):
                         logging.info(f"Found device {device.hostname}")
+                        # Fetch interfaces for this device
                         interfaces=[]
-                        if 'family' in device and 'Unified AP' not in device.family: 
-                            try:
-                                logging.info(f"Getting all interfaces for device: {device['hostname']}")
-                                interface_response = client.devices.get_interface_info_by_id(device['id'])
-                                if interface_response and hasattr(interface_response, "response"):
-                                    for interface in interface_response.response:
-                                        interfaces.append({
-                                                "name": interface.portName,
-                                                "mac": getattr(interface, "macAddress", None),
-                                                "speed": interface.speed,
-                                                "duplex": getattr(interface, "duplex", None),
-                                                "enabled": interface.status.lower(),
-                                                "mtu": interface.mtu,
-                                                "description": interface.description,
-                                                "ips": [
-                                                f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
-                                                for ip in getattr(interface, "addresses", {})
-                                            ] if hasattr(interface, "addresses") else []
-                                        })
-                            except Exception as e:
+                        try:
+                            interfaces_response = client.devices.get_interface_info_by_id(device.id).response
+                            print(f"Fetched {len(interfaces_response)} interfaces for device {device.hostname}")
+                            
+                            # Process interfaces
+                            interfaces = [{
+                                    "name": interface.portName,
+                                    "mac": getattr(interface, "macAddress", None),
+                                    "speed": interface.speed,
+                                    "duplex": getattr(interface, "duplex", None),
+                                    "enabled": interface.status.lower(),
+                                    "mtu": interface.mtu,
+                                    "description": interface.description,
+                                    "ips": [
+                                    f"{ip.address.ipAddress.address}/{ip.address.ipMask.addresss}" 
+                                        for ip in getattr(interface, "addresses", {})
+                                    ]
+                                } for interface in interfaces_response
+                            ]
+                            if 'family' in device and 'Unified AP' in device.family:
+                                logging.info(f"Getting Device {device.hostname} Access Point Interface info")
+                                interfaces.append({
+                                        "name": "mgmt0",
+                                        "mac": device['macAddress'],
+                                        "speed": 1000,
+                                        "duplex": "full",
+                                        "enabled": "up",
+                                        "ips": [f"{device.managementIpAddress}/24"] 
+                                })
+                                interfaces.append({
+                                        "name": "radio0",
+                                        "mac": device['apEthernetMacAddress'],
+                                        "speed": 1000,
+                                        "duplex": "full",
+                                        "enabled": "up",
+                                        "ips": [],
+                                })
+                        except Exception as e:
                                  logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")  
-                        elif 'family' in device and 'Unified AP' in device.family:
-                            logging.info(f"Getting Device {device.hostname} Access Point Interface info")
-                            interfaces.append({
-                                    "name": "mgmt0",
-                                    "mac": device['macAddress'],
-                                    "speed": 1000,
-                                    "duplex": "full",
-                                    "enabled": "up",
-                                    "ips": [f"{device.managementIpAddress}/24"] 
-                            })
-                            interfaces.append({
-                                    "name": "radio0",
-                                    "mac": device['apEthernetMacAddress'],
-                                    "speed": 1000,
-                                    "duplex": "full",
-                                    "enabled": "up",
-                                    "ips": [],
-                            })
-                            device.enabled=device.reachabilityStatus.lower()
-                        else:
-                            logging.info(f"Device {device.hostname} has no interfaces")
                             
                         device.site = site.name
                         device.interfaces = interfaces

@@ -41,12 +41,12 @@ def prepare_device_data(devices):
                 try:
 
                     interface_data = Interface(
-                        name=interface.get("portName"),
-                        mac=interface.get("macAddress"),
+                        name=interface.get("name"),
+                        mac=interface.get("ma"),
                         description=interface.description,
                         type=transformer.infer_interface_type(
-                            interface.get("portName"), interface.get("speed")
-                        ),
+                            interface.get("name"), interface.get("speed")
+                        ) if 'radio0' not in interface.portName else "virtual",
                         speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
                         duplex=transformer.map_duplex(interface.get("duplex")),
                         enabled=interface.get("status", "").lower() in ["connected", "up", "reachable"],
