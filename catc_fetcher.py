@@ -6,21 +6,38 @@ def fetch_device_data(client):
     """
     try:
         logging.info("Fetching all devices from Catalyst Center...")
-        devices_response = client.devices.get_device_list()
+        devices_response = []
+        offset = 1
+        limit = 500  # Adjust this as needed
+        while True:
+            response = client.devices.get_device_list(offset=offset, limit=limit)
+            if not response or not hasattr(response, "response"):
+                break
+            devices_response.extend(response.response)
+            if len(response.response) < limit:
+                break  # Last page
+            offset += limit
         all_devices = {
-            device.serialNumber: device for device in devices_response.response if hasattr(device, "serialNumber")
+            device.serialNumber: device for device in devices_response if hasattr(device, "serialNumber")
         }
         logging.info(f"Fetched {len(all_devices)} devices.")
 
         logging.info("Fetching all sites from Catalyst Center...")
-        sites_response = client.sites.get_site()
-        if not sites_response.response:
-            raise ValueError("No sites found in Catalyst Center.")
-        logging.info(f"Fetched {len(sites_response.response)} sites.")
+        sites_response = []
+        offset = 1
+        while True:
+            response = client.sites.get_site(offset=offset, limit=limit)
+            if not response or not hasattr(response, "response"):
+                break
+            sites_response.extend(response.response)
+            if len(response.response) < limit:
+                break  # Last page
+            offset += limit
+        logging.info(f"Fetched {len(sites_response)} sites.")
 
         site_device_map = {}
 
-        for site in sites_response.response:
+        for site in sites_response:
             site_name = site.get("siteNameHierarchy", "Unknown")
             logging.info(f"Processing site: {site_name}")
 
@@ -30,7 +47,7 @@ def fetch_device_data(client):
                 continue
 
             site_devices = []
-            for member_device in membership.device.response:
+            for member_device in membership.device:
                 serial_number = member_device.get("serialNumber")
                 if serial_number and serial_number in all_devices:
                     device_record = all_devices[serial_number]
