@@ -41,7 +41,7 @@ def fetch_device_data(client):
             site_name = site.get("siteNameHierarchy", "Unknown")
             logging.info(f"Processing site: {site_name}")
 
-            membership = client.sites.get_membership(site_id=site.id)
+            membership = client.sites.get_membership(site_id=site.id).response
             if not membership or not hasattr(membership, "device") or not membership.device:
                 logging.warning(f"No devices found for site: {site_name}")
                 continue
