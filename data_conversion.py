@@ -12,8 +12,6 @@ def prepare_device_data(devices):
 
     for device in devices:
         try:
-            logging.info(f"Processing device: {device.get('hostname', 'unknown')}")
-
             # Transform device fields
             location = transformer.transform_location(device.get("siteNameHierarchy"))
             if len(location) < 1:
@@ -38,7 +36,6 @@ def prepare_device_data(devices):
             # Process interfaces for the device
             for interface in device.get("interfaces", []):
                 try:
-                    logging.info(f"Processing interface: {interface.get('portName', 'unknown')}")
 
                     interface_data = Interface(
                         name=interface.get("portName"),
@@ -57,7 +54,6 @@ def prepare_device_data(devices):
                     # Process IPs for the interface
                     for ip in interface.get("ips", []):
                         try:
-                            logging.info(f"Processing IP: {ip}")
                             ip_data = IPAddress(
                                 address=ip,
                                 interface=interface_data,
@@ -66,6 +62,7 @@ def prepare_device_data(devices):
                             )
                             entities.append(Entity(ip_address=ip_data))
                             logging.info(f"Processed IP: {ip}")
+                            
                         except Exception as ip_error:
                             logging.error(f"Error processing IP {ip}: {ip_error}")
 
