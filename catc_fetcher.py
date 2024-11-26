@@ -38,7 +38,7 @@ def fetch_device_data(client):
         logging.info(f"Fetched {len(sites)} sites.")
         
         logging.info("Linking Devices to Sites")
-        devices = []
+        devices =[]
         site_num = 0
         for site in sites:
             site_num += 1
@@ -51,7 +51,7 @@ def fetch_device_data(client):
                 for device in members.response:
                     if hasattr(device, 'serialNumber'):
                         logging.info(f"Found device {device.hostname}")
-                        interfaces={}
+                        interfaces=[]
                         if int(device.interfaceCount) > 0:
                             try:
                                 logging.info(f"Getting all interfaces for device: {device['hostname']}")
@@ -73,8 +73,9 @@ def fetch_device_data(client):
                                         })
                             except Exception as e:
                                  logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
+                                 
                         elif 'Unified AP' in device.family:
-                            logging.info(f"Getting Device {device.name} Access Point Interface info")
+                            logging.info(f"Getting Device {device.hostname} Access Point Interface info")
                             interfaces.append({
                                     "name": "mgmt0",
                                     "mac": device['macAddress'],
