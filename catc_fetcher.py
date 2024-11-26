@@ -1,11 +1,13 @@
 import logging
 
-def get_paginated_objects(client, fetch_method, object_name, limit=500):
+def get_paginated_objects(fetch_method, object_name, limit=500):
 
     logging.info(f"Fetching all {object_name} from Catalyst Center...")
     results = []
     offset = 1
-
+    
+    if 'site' in object_name: limit = 10
+    
     while True if not 'site' in object_name else offset < 10:
         try:
             response = fetch_method(offset=offset, limit=limit)
@@ -25,7 +27,7 @@ def get_paginated_objects(client, fetch_method, object_name, limit=500):
 
 def get_sites_with_devices(client):
 
-    sites = get_paginated_objects(client, client.sites.get_site, "sites")
+    sites = get_paginated_objects(client.sites.get_site, "sites")
     site_structure = []
 
     for site in sites:
@@ -46,7 +48,7 @@ def get_sites_with_devices(client):
 
 def get_device_details(client):
 
-    devices = get_paginated_objects(client, client.devices.get_device_list, "devices")
+    devices = get_paginated_objects(client.devices.get_device_list, "devices")
     return {device.serialNumber: device for device in devices.response if hasattr(device.response, "serialNumber")}
 
 def get_interfaces(client, device_id):
