@@ -42,6 +42,7 @@ def fetch_device_data(client):
             logging.info(f"Processing site: {site_name}")
 
             membership = client.sites.get_membership(site_id=site.id)
+            
             if not membership or not hasattr(membership, "device") or not membership.device:
                 logging.warning(f"No devices found for site: {site_name}")
                 continue
@@ -51,7 +52,8 @@ def fetch_device_data(client):
             site_devices = []
             for member_device in membership.device:
                 logging.info(f"Processing device: {member_device['hostname']}")
-                serial_number = member_device.response.get("serialNumber")
+                logging.info(f"Processing device: {member_device.response['hostname']}")
+                serial_number = member_device.response["serialNumber"]
                 logging.info(f"Serial: {serial_number}")
                 if serial_number and serial_number in all_devices:
                     device_record = all_devices[serial_number]
