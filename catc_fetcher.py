@@ -54,12 +54,12 @@ def fetch_device_data(client):
                 serial_number = member_device.response.get("serialNumber")
                 if serial_number and serial_number in all_devices:
                     device_record = all_devices[serial_number]
-                    logging.info(f"Found device: {device_record.hostname}")
+                    logging.info(f"Found device: {device_record.response}")
 
                     # Fetch interfaces for this device
                     interfaces = []
                     try:
-                        logging.info(f"Fetching interfaces for device: {device_record.hostname}")
+                        logging.info(f"Fetching interfaces for device: {device_record.response.hostname}")
                         interface_response = client.devices.get_interface_info_by_id(device_record.id)
                         if interface_response and hasattr(interface_response, "response"):
                             for interface in interface_response.response:
