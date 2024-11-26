@@ -75,9 +75,22 @@ def fetch_device_data(client):
                                  logging.error(f"Error fetching interfaces for device {device.hostname}: {e}")
                         elif 'Unified AP' in device.family:
                             logging.info(f"Getting Device {device.name} Access Point Interface info")
-                            apEthernetMacAddress
-                            macAddress
-                            managementIpAddressvv
+                            interfaces.append({
+                                    "name": "mgmt0",
+                                    "mac": device['macAddress'],
+                                    "speed": 1000,
+                                    "duplex": "full",
+                                    "enabled": "up",
+                                    "ips": [f"{device.managementIpAddress}/24"] 
+                            })
+                            interfaces.append({
+                                    "name": "radio0",
+                                    "mac": device['apEthernetMacAddress'],
+                                    "speed": 1000,
+                                    "duplex": "full",
+                                    "enabled": "up",
+                                    "ips": [],
+                            })
                         else:
                             logging.info(f"Device {device.name} has no interfaces")
                             
