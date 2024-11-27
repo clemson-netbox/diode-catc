@@ -6,9 +6,9 @@ def get_paginated_objects(fetch_method, object_name, limit=500):
     results = []
     offset = 1
     
-    if 'site' in object_name: limit = 10
+    if 'site' in object_name: limit = 5
     
-    while True if not 'site' in object_name else offset < 10:
+    while True if not 'site' in object_name else offset < limit:
         try:
             response = fetch_method(offset=offset, limit=limit)
             if not response or not hasattr(response, "response"):
@@ -49,7 +49,7 @@ def get_sites_with_devices(client):
 def get_device_details(client):
 
     devices = get_paginated_objects(client.devices.get_device_list, "devices")
-    return {device.serialNumber: device for device in devices.response if hasattr(device.response, "serialNumber")}
+    return {device.response.serialNumber: device.response for device in devices}
 
 def get_interfaces(client, device_id):
     """
