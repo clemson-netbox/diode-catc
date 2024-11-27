@@ -34,7 +34,7 @@ def get_device_data(client):
         logging.info(f"Collected site {site} for {device['hostname']}")
 
         # get the site id
-        response = client.devices.get_interface_info_by_id(dentifier='uuid', search_by=device['id'])
+        response = client.devices.get_interface_info_by_id(device_id=device['id'])
         interfaces.extend(response['response'])  
         for interface in interfaces:
             logging.info(f"Collected interface {interface.portName} for {device['hostname']}")
