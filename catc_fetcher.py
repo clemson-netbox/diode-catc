@@ -31,8 +31,11 @@ def get_device_data(client,logging):
         """
         Extracts the site prefix from a hostname based on the patterns for Access Points and Routers/Switches.
         """
-        ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}$"
-        rs_regex = r"^(.*)-C?[0-9]+[a-zA-Z0-9-]*$"
+        #a-iptay-2-211j-ap9136i
+        ap_regex = r"^([a-z].+)-ap[0-9a-z]{4,5}$"
+        
+        #AE-Newberry-C930024ps-18.clemson.edu
+        rs_regex = r"^(.+)-C*\d{3,}[^-]+$"
 
         # Check Access Points
         ap_match = re.match(ap_regex, hostname)
@@ -87,17 +90,18 @@ def get_device_data(client,logging):
         items += 1         
         
         try:
-            logging.debug(f"Retrieving site name for device #{items}/{str(device_count)}: {device['hostname']}")
-            site_prefix = _extract_site_name(device['hostname'])
             hostname = device.get('hostname')
+            logging.debug(f"Retrieving site name for device #{items}/{str(device_count)}: {hostname}")
+            site_prefix = _extract_site_name(hostname)
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
                 logging.info(f"Using cache {site_prefix}: {device.site}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
-                site_cache[site_prefix] = device.site
-                logging.info(f"CACHING prefix {site_prefix}")
+                if site_prefix != hostname:
+                    site_cache[site_prefix] = device.site
+                    logging.info(f"CACHING prefix {site_prefix}")
                 
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
