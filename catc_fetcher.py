@@ -98,7 +98,7 @@ def get_device_data(client,logging):
                     logging.info(f"Fetching interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])
                 except:
-                    logging.warning(f"No interfaces found for device {device['hostname']}")
+                    logging.debug(f"No interfaces found for device {device['hostname']}")
                     device_inventory.append(device)
                     continue
             else:
