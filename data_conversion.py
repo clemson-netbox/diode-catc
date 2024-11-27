@@ -12,6 +12,19 @@ def prepare_data(merged_data):
         site_name = site["name"]
         logging.info(f"Processing site: {site_name}")
 
+        #{'instanceUuid': '3dbe852a-1354-4d54-a77b-3219e995364b', 'instanceTenantId': '5f203c960f1a1c00c6926d61', 'deployPending': 'NONE', 'instanceVersion': 2, 
+        # 'apEthernetMacAddress': '38:90:a5:f9:3d:cc', 'apManagerInterfaceIp': '172.19.3.84', 'associatedWlcIp': '172.19.3.84', 'collectionInterval': 'NA', 
+        # 'collectionStatus': 'Managed', 'collectionTier': '', 'deviceSupportLevel': 'Supported', 'dnsResolvedManagementAddress': '', 'errorCode': 'null', 
+        # 'family': 'Unified AP', 'hostname': 'o-edisto-towere-ap2702e-115', 'interfaceCount': '0', 'inventoryStatusDetail': 'NA', 'lastDeviceResyncStartTime': '', 
+        # 'lastManagedResyncReasons': '', 'lastUpdateTime': 1732635607009, 'lastUpdated': '2024-11-26 15:40:07', 'lineCardCount': '0', 'lineCardId': '', 
+        # 'macAddress': '70:7d:b9:33:47:c0', 'managedAtleastOnce': False, 'managementIpAddress': '10.120.53.115', 'managementState': 'Managed', 'memorySize': 'NA', 
+        # 'paddedMgmtIpAddress': ' 10.120. 53.115', 'pendingSyncRequestsCount': '0', 'platformId': 'AIR-CAP2702E-B-K9', 'reachabilityFailureReason': 'NA', 
+        # 'reachabilityStatus': 'Reachable', 'reasonsForDeviceResync': '', 'reasonsForPendingSyncRequests': '', 'role': 'ACCESS', 'roleSource': 'AUTO', 
+        # 'serialNumber': 'FJC2139M0TN', 'series': 'Cisco 2700E Series Unified Access Points', 'snmpContact': '', 'snmpLocation': 'Edisto Tower E', 
+        # 'softwareVersion': '8.5.182.105', 'syncRequestedByApp': '', 'tagCount': '0', 'tunnelUdpPort': '16666', 'type': 'Cisco 2700E Unified Access Point', 
+        # 'upTime': '56 days, 13:35:07.570', 'uptimeSeconds': 4927533, 'vendor': 'NA'}  
+
+
         for device_data in site["devices"]:
             try:
                 # Transform device fields
