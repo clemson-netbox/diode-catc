@@ -27,13 +27,13 @@ def get_device_data(client):
         device_details.update({'role': device['role']})
 
         # get the device site hierarchy
-        response = client.devices.get_device_detail(device['id'])
+        response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
         site = response['response']['location']
         device_details.update({'site': site})
         logging.info(f"Collected site {site} for {device['hostname']}")
 
         # get the site id
-        response = client.devices.get_interface_info_by_id(identifier='uuid', search_by=device['id'])
+        response = client.devices.get_interface_info_by_id(dentifier='uuid', search_by=device['id'])
         interfaces.extend(response['response'])  
         for interface in interfaces:
             logging.info(f"Collected interface {interface.portName} for {device['hostname']}")
