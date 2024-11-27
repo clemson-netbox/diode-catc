@@ -1,6 +1,6 @@
 import logging
 
-def get_device_info(client):
+def get_device_data(client):
     # get the device count
     response = client.devices.get_device_count()
     device_count = response['response']
