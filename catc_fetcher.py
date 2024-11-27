@@ -6,7 +6,7 @@ def get_paginated_objects(fetch_method, object_name, limit=500):
     results = []
     offset = 1
     
-    if 'site' in object_name: limit = 5
+    if 'site' in object_name: limit = 20
     
     while True if not 'site' in object_name else offset < limit:
         try:
