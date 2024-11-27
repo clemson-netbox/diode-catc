@@ -59,7 +59,8 @@ def get_device_data(client):
         if 'serialNumber' not in device:
             continue
         
-        print(f"{site_sn[device.serialNumber]} - {device['hostname']}")            
+        print(f"{site_sn[device.serialNumber]} - {device['hostname']}")   
+        device.site=site_sn[device.serialNumber]  
         
         try:
             if not 'Unified AP' in device.family:
