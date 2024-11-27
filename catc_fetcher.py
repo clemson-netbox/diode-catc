@@ -38,6 +38,8 @@ def get_device_data(client):
         
     items=0
     for device in device_list:
+        items += 1
+
         interfaces = []
     
         logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
@@ -64,6 +66,5 @@ def get_device_data(client):
         device.interfaces=interfaces
         
         device_inventory.append(device)
-        items += 1
         
     return device_inventory
