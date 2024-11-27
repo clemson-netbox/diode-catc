@@ -11,11 +11,13 @@ def get_device_data(client):
     limit = 500
     device_list = []
     interfaces = []
+    item=0
     while offset <= device_count:
         response = client.devices.get_device_list(offset=offset)
         offset += limit
         device_list.extend(response['response'])
-        logging.info("Retrieved 500 devices")
+        item += 500
+        logging.info(f"Retrieved {item} devices")
     logging.info('Collected the device list from Cisco Catalyst Center')
 
     device_inventory = []
