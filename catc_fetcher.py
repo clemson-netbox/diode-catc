@@ -36,8 +36,7 @@ def get_device_data(client):
             continue
             
         interfaces.extend(response['response'])  
-        for interface in interfaces:
-            logging.info(f"Found interface {interface.portName} for {device['hostname']}")
+        logging.info(f"Found {len(interfaces)} interfaces for {device['hostname']}")
         device.interfaces=interfaces
         
         device_inventory.append(device)
