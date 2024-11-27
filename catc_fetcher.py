@@ -98,6 +98,7 @@ def get_device_data(client,logging):
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
+                logging.debug(f"Cache Miss: {hostname}: {device.site}")
                 if site_prefix != hostname:
                     site_cache[site_prefix] = device.site
                     logging.info(f"CACHING prefix {site_prefix}")
@@ -122,7 +123,7 @@ def get_device_data(client,logging):
         interfaces.extend(response['response'])  
         logging.debug(f"Found {len(interfaces)} interfaces for {device['hostname']}")
         device.interfaces=interfaces
-        _save_site_cache(site_cache)  # Save cache at the end of processing
-
+        _save_site_cache(site_cache) 
         device_inventory.append(device)
+        
     return device_inventory
