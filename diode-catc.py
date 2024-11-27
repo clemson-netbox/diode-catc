@@ -3,7 +3,7 @@ import argparse
 import os
 from dotenv import load_dotenv
 from catc_connector import connect_to_catc
-from catc_fetcher import merge_data
+from catc_fetcher import get_device_data
 from data_conversion import prepare_data
 from netboxlabs.diode.sdk import DiodeClient
 from version import __version__
@@ -90,7 +90,7 @@ def main():
 
             # Fetch data from Catalyst Center
             logging.info("Fetching device data from Catalyst Center...")
-            devices = merge_data(catc)
+            devices = get_device_data(catc)
             logging.info(f"Fetched {len(devices)} devices.")
 
             # logging.info("Fetching interface data for all devices...")

@@ -1,113 +1,42 @@
 import logging
 
-def get_paginated_objects(fetch_method, object_name, limit=500):
+def get_device_info(client):
+    # get the device count
+    response = client.devices.get_device_count()
+    device_count = response['response']
+    logging.info('Number of devices managed by Cisco Catalyst Center: ' + str(device_count))
 
-    logging.info(f"Fetching all {object_name} from Catalyst Center...")
-    results = []
+    # get the device info list
     offset = 1
-    
-    if 'site' in object_name: limit = 20
-    
-    while True if not 'site' in object_name else offset < limit:
-        try:
-            response = fetch_method(offset=offset, limit=limit)
-            if not response or not hasattr(response, "response"):
-                break
-            results.extend(response.response)
-            logging.info(f"Fetched {len(response.response)} {object_name} (offset: {offset})")
-            if len(response.response) < limit:
-                break
-            offset += limit
-        except Exception as e:
-            logging.error(f"Error fetching {object_name} at offset {offset}: {e}")
-            break
-
-    logging.info(f"Fetched a total of {len(results)} {object_name}.")
-    return results
-
-def get_sites_with_devices(client):
-
-    sites = get_paginated_objects(client.sites.get_site, "sites")
-    site_structure = []
-
-    for site in sites:
-        site_name = site.get("siteNameHierarchy", "Unknown")
-        site_entry = {"name": site_name, "devices": []}
-        try:
-            response = client.sites.get_membership(site_id=site.id)
-            for members in response.device:
-                for member in members.response:
-                    logging.info(f"{member.hostname} found for site: {site_name}")
-                    site_entry["devices"].append(member)
-        except Exception as e:
-            logging.error(f"Error fetching membership for site {site_name}: {e}")
-
-        site_structure.append(site_entry)
-
-    return site_structure
-
-def get_device_details(client):
-
-    devices = get_paginated_objects(client.devices.get_device_list, "devices")
-    return {device.serialNumber: device for device in devices}
-
-def get_interfaces(client, device_id):
-    """
-    Fetches interfaces for a device by ID.
-    """
+    limit = 500
+    device_list = []
     interfaces = []
-    try:
-        response = client.devices.get_interface_info_by_id(device_id)
-        if response and hasattr(response, "response"):
-            for interface in response.response:
-                interfaces.append({
-                    "name": interface.portName,
-                    "macAddress": interface.macAddress,
-                    "speed": interface.speed * 1000 if hasattr(interface, "speed") else None,
-                    "type": interface.interfaceType if hasattr(interface, "interfaceType") else None,
-                    "status": interface.status if hasattr(interface, "status") else "unknown",
-                    "ips": [
-                        f"{ip.ipAddress}/{ip.prefixLength}" 
-                        for ip in getattr(interface, "ipConfig", {}).get("ipAddress", [])
-                    ] if hasattr(interface, "ipConfig") else []
-                })
-    except Exception as e:
-        logging.error(f"Error fetching interfaces for device ID {device_id}: {e}")
-    return interfaces
+    while offset <= device_count:
+        response = client.devices.get_device_list(offset=offset)
+        offset += limit
+        device_list.extend(response['response'])
+    logging.info('Collected the device list from Cisco Catalyst Center')
 
-def merge_data(client):
-    """
-    Merges site, device, and interface data into a single structure.
-    """
-    try:
-        # Fetch all sites with their devices
-        site_structure = get_sites_with_devices(client)
+    device_inventory = []
+    for device in device_list:
+        device_details = {'hostname': device['hostname']}
+        device_details.update({'device_ip': device['managementIpAddress']})
+        device_details.update({'device_id': device['id']})
+        device_details.update({'version': device['softwareVersion']})
+        device_details.update({'device_family': device['type']})
+        device_details.update({'role': device['role']})
 
-        # Fetch all devices
-        device_dict = get_device_details(client)
+        # get the device site hierarchy
+        response = client.devices.get_device_detail(device['id'])
+        site = response['response']['location']
+        device_details.update({'site': site})
+        logging.info(f"Collected site {site} for {device['hostname']}")
 
-        # Enrich devices with interfaces and IPs
-        for site in site_structure:
-            for member_device in site["devices"]:
-                serial_number = member_device.get("serialNumber")
-                if serial_number in device_dict:
-                    device = device_dict[serial_number]
-                    device_id = device.id
-                    print(f"{device}")
-                    logging.info(f"Matched {device.hostname} to {site['name']}")
-                    interfaces = get_interfaces(client, device_id) if device_id else []
-                    logging.info(f"Found {len(interfaces)} interfaces for {device.hostname}")
-                    # Update member device with complete details
-                    member_device.update({
-                        "site": site["name"],
-                        "interfaces": interfaces,
-                        "details": device  # Include full device details
-                    })
-
-        logging.info("Data merging complete.")
-        return site_structure
-
-    except Exception as e:
-        logging.error(f"Error merging data: {e}")
-        raise
-
+        # get the site id
+        response = client.devices.get_interface_info_by_id(identifier='uuid', search_by=device['id'])
+        interfaces.extend(response['response'])  
+        for interface in interfaces:
+            logging.info(f"Collected interface {interface.portName} for {device['hostname']}")
+        device_inventory.append(device_details)
+        
+    logging.info('Collected the device inventory from Cisco DNA Center')
