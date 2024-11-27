@@ -43,6 +43,8 @@ def get_device_data(client):
         interfaces = []
     
         logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
+        if 'serialNumber' not in device:
+            continue
         
         try:
             if not 'Unified AP' in device.family:
