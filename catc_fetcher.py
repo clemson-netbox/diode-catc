@@ -24,11 +24,11 @@ def get_device_data(client):
     for device in device_list:
         interfaces = []
         
-        response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
-        site = response['response']['location']
-        device.update({'site': site})
-        logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']} in {site}")
-
+        # response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
+        # site = response['response']['location']
+        # device.update({'site': site})
+        # logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']} in {site}")
+        logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
         try:
             response = client.devices.get_interface_info_by_id(device_id=device['id'])
         except:
