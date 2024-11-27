@@ -43,8 +43,7 @@ def get_device_data(client):
         for device_entry in devices_response:
             device_list = device_entry.get('response', [])
             for device in device_list:
-                site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
-    
+                site_sn[device.get('serialNumber')]=site['siteNameHierarchy']
                 #logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialNumber')}")
     logging.info('Collected complete device mapping list from Cisco Catalyst Center')
                
