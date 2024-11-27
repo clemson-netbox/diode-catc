@@ -64,7 +64,6 @@ def get_device_data(client):
     
     for device in device_list:
         interfaces = []    
-        logging.info(f"Fetching interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
         # if 'serialNumber' not in device:
         #     logging.warning(f"Serial number not found on device. Skipping device {device['hostname']}.")
         #     continue
@@ -91,15 +90,16 @@ def get_device_data(client):
                 site_cache[site_prefix] = device.site
                 logging.info(f"Caching site name {device.site} for prefix {site_prefix}")
                 
+            #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
                 try:
+                    logging.info(f"Fetching interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])
                 except:
-                    logging.info(f"NON AP: No interfaces found for device {device['hostname']}")
+                    logging.info(f"No interfaces found for device {device['hostname']}")
                     device_inventory.append(device)
                     continue
             else:
-                logging.info(f"AP: No interfaces found for device {device['hostname']}")
                 device_inventory.append(device)
                 continue
 
