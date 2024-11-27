@@ -29,9 +29,15 @@ def get_device_data(client):
         # device.update({'site': site})
         # logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']} in {site}")
         logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
-        try:
-            response = client.devices.get_interface_info_by_id(device_id=device['id'])
-        except:
+        
+        if not 'Unified AP' in device.family:
+            try:
+                response = client.devices.get_interface_info_by_id(device_id=device['id'])
+            except:
+                logging.error(f"No interfaces found for device {device['hostname']}")
+                device_inventory.append(device)
+                continue
+        else:
             logging.error(f"No interfaces found for device {device['hostname']}")
             device_inventory.append(device)
             continue
