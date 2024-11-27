@@ -40,11 +40,12 @@ def get_device_data(client):
         if site['siteNameHierarchy'] == 'Global': continue
         logging.info(f"Processing site = {site['siteNameHierarchy']}")
         response=client.sites.get_membership(site_id=site.id)
-        logging.info(f"Devices: {response}")
         if 'device' in response:
-            for device in response.response:
-                site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
-                logging.info(f"Assigning {site['siteNameHierarchy']} to Serial #{device.get('serialnumber')}")
+            logging.info(f"Devices: {response.device}")
+            for group in response.device:
+                for device in group.response:
+                    site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
+                    logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialnumber')}")
         
     device_inventory = []
         
