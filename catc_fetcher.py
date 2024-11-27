@@ -102,28 +102,24 @@ def get_device_data(client,logging):
                 if site_prefix != hostname:
                     site_cache[site_prefix] = device.site
                     logging.info(f"CACHING prefix {site_prefix}")
+                    _save_site_cache(site_cache) 
                 
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
                 try:
                     logging.info(f"Retrieving interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
-                    response = client.devices.get_interface_info_by_id(device_id=device['id'])
+                    response = client.devices.get_interface_info_by_id(device_id=device['id'])        
+                    interfaces.extend(response['response'])  
+                    device.interfaces=interfaces
+                    logging.debug(f"Found {len(interfaces)} interfaces for {device['hostname']}")
                 except:
                     logging.debug(f"No interfaces found for device {device['hostname']}")
-                    device_inventory.append(device)
                     continue
-            else:
-                device_inventory.append(device)
-                continue
-
+    
         except Exception as e:
             logging.error(f"An error occurred collecting device data: {e}")
             continue
         
-        interfaces.extend(response['response'])  
-        logging.debug(f"Found {len(interfaces)} interfaces for {device['hostname']}")
-        device.interfaces=interfaces
-        _save_site_cache(site_cache) 
         device_inventory.append(device)
         
     return device_inventory

@@ -71,7 +71,7 @@ def prepare_data(devices,logging):
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
-                logging.info(f"Processed interface: mgmt0")
+                logging.info(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
                 interface_entity = Interface(
                         name='radio0',
@@ -83,44 +83,45 @@ def prepare_data(devices,logging):
                         tags=["Diode-CATC-Agent"],
                     )
                 entities.append(Entity(interface=interface_entity))
-                logging.info(f"Processed interface: ap0")
-                
-            for interface in device.get("interfaces", []):
-                try:
-                    interface_entity = Interface(
-                        name=interface.get("name"),
-                        ma_address=interface.get("macAddress"),
-                        description=interface.get("description"),
-                        type=transformer.infer_interface_type(
-                            interface.get("name"), interface.get("speed")
-                        ),
-                        speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
-                        enabled=interface.get("status", "").lower()
-                        in ["connected", "up", "reachable"],
-                        mtu=interface.get("mtu"),
-                        tags=["Diode-CATC-Agent"],
-                    )
-                    entities.append(Entity(interface=interface_entity))
-                    logging.info(f"Processed interface: {interface_entity.name}")
+                logging.info(f"Processed AP interface: radio0")
+            
+            else:
+                    
+                for interface in device.get("interfaces", []):
+                    try:
+                        interface_entity = Interface(
+                            name=interface.get("name"),
+                            ma_address=interface.get("macAddress"),
+                            description=interface.get("description"),
+                            type=transformer.infer_interface_type(
+                                interface.get("name"), interface.get("speed")
+                            ),
+                            speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
+                            enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
+                            mtu=interface.get("mtu"),
+                            tags=["Diode-CATC-Agent"],
+                        )
+                        entities.append(Entity(interface=interface_entity))
+                        logging.info(f"Processed interface: {interface_entity.name}")
 
-                    # Process IPs for the interface
-                    for ip in interface.get("ips", []):
-                        try:
-                            ip_data = IPAddress(
-                                address=ip,
-                                interface=interface_entity,
-                                description=f"{device_data.name} {interface.get('name')} {interface.get('description')}",
-                                tags=["Diode-CATC-Agent"],
-                            )
-                            entities.append(Entity(ip_address=ip_data))
-                            logging.info(f"Processed IP: {ip}")
-                        except Exception as ip_error:
-                            logging.error(f"Error processing IP {ip}: {ip_error}")
+                        # Process IPs for the interface
+                        for ip in interface.get("ips", []):
+                            try:
+                                ip_data = IPAddress(
+                                    address=ip,
+                                    interface=interface_entity,
+                                    description=f"{device_data.name} {interface.get('name')} {interface.get('description')}",
+                                    tags=["Diode-CATC-Agent"],
+                                )
+                                entities.append(Entity(ip_address=ip_data))
+                                logging.info(f"Processed {interface_entity.name} IP: {ip}")
+                            except Exception as ip_error:
+                                logging.error(f"Error processing IP {ip}: {ip_error}")
 
-                except Exception as interface_error:
-                    logging.error(
-                        f"Error processing interface {interface.get('name', 'unknown')}: {interface_error}"
-                    )
+                    except Exception as interface_error:
+                        logging.error(
+                            f"Error processing interface {interface.get('name', 'unknown')}: {interface_error}"
+                        )
 
         except Exception as device_error:
             logging.error(
