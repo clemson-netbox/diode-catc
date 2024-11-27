@@ -20,7 +20,7 @@ class Transformer:
         import re
         return re.sub(pattern, replacement, value)
 
-    def get_cidr(ip, subnet_mask):
+    def get_cidr(self,ip, subnet_mask):
         """
         Convert IP and subnet mask into CIDR notation.
         """
@@ -31,7 +31,7 @@ class Transformer:
         except ValueError:
             return None
 
-    def map_duplex(duplex):
+    def map_duplex(self,duplex):
         """
         Map Cisco DNAC duplex values to NetBox expected values.
         """
@@ -42,7 +42,7 @@ class Transformer:
             return "full" if duplex else "half"
         return "auto"  # Default to auto if duplex is missing or unrecognized
 
-    def infer_interface_type(port_name, speed):
+    def infer_interface_type(self,port_name, speed):
         """
         Infer interface type based on portName and speed.
         """
