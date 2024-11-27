@@ -38,7 +38,7 @@ def get_device_data(client,logging):
         if match:
             return match.group(1)
         else:
-            match = re.match(r'^(.+?-[0-9a-z])-.*$', hostname)
+            match = re.match(r'^(.+?-[1-9a-z]{1,2})-.*$', hostname)
             if match:
                 return match.group(1)
         return hostname
