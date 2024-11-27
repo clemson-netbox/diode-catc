@@ -43,7 +43,7 @@ def prepare_data(devices):
                     device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
-                site=site_name,
+                site=transformer.transform_location(device_data.get("site")),
                 # location=location,  # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
                 tags=["Diode-CATC-Agent"],
