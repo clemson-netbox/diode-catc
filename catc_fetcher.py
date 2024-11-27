@@ -38,6 +38,8 @@ def get_device_data(client):
     logging.info('Retrieving device locations')
     for site in site_list:
         response=client.sites.get_membership(site_id=site.id)
+        logging.info(f"Processing site = {site['siteNameHierarchy']}")
+        logging.info(f"Devices: {response}")
         for device in response.device:
             site_sn[device.response.get('serialnumber')]=site['siteNameHierarchy']
             logging.info(f"Assigning {site['siteNameHierarchy']} to Serial #{device.response.get('serialnumber')}")
