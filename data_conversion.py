@@ -12,9 +12,10 @@ def prepare_data(merged_data):
         site_name = site["name"]
         logging.info(f"Processing site: {site_name}")
 
-        for device in site["devices"]:
+        for device_data in site["devices"]:
             try:
                 # Transform device fields
+                device=device_data.details
                 location = transformer.transform_location(device.get("siteNameHierarchy"))
                 if len(location) < 1:
                     location = transformer.transform_site(device.get("siteNameHierarchy"))
@@ -22,7 +23,7 @@ def prepare_data(merged_data):
                     location = device["snmpLocation"]
 
                 #TODO: Handle stackwise
-                device_data = Device(
+                device_entity = Device(
                     name=transformer.transform_name(device.get("hostname")),
                     device_type=transformer.transform_device_type(device.get("platformId")),
                     manufacturer="Cisco",
@@ -36,12 +37,12 @@ def prepare_data(merged_data):
                     status=transformer.transform_status(device.get("reachabilityStatus")),
                     tags=["Diode-CATC-Agent"],
                 )
-                entities.append(Entity(device=device_data))
+                entities.append(Entity(device=device_entity))
                 logging.info(f"Processed device: {device_data.name}")
 
                 # Process interfaces for the device
                 if 'Unified AP' in device['family']:
-                    interface_data = Interface(
+                    interface_entity = Interface(
                             name='mgm0t',
                             mac=device.get("macAddress"),
                             device=device, 
@@ -52,17 +53,17 @@ def prepare_data(merged_data):
                             enabled=True,
                             tags=["Diode-CATC-Agent"],
                         )
-                    entities.append(Entity(interface=interface_data))
-                    ip_data = IPAddress(
+                    entities.append(Entity(interface=interface_entity))
+                    ip_entity = IPAddress(
                         address=device['managementIpAddress'],
-                        interface=interface_data,
+                        interface=interface_entity,
                         description=f"{device_data.name} mgmt0",
                         tags=["Diode-CATC-Agent"],
                     )
-                    entities.append(Entity(ip_address=ip_data))
+                    entities.append(Entity(ip_address=ip_entity))
                     logging.info(f"Processed interface: mgmt0")
 
-                    interface_data = Interface(
+                    interface_entity = Interface(
                             name='radio0',
                             device=device, 
                             mac=device.get("apEthernetMacAddress"),
@@ -71,11 +72,11 @@ def prepare_data(merged_data):
                             enabled=True,
                             tags=["Diode-CATC-Agent"],
                         )
-                    entities.append(Entity(interface=interface_data))
+                    entities.append(Entity(interface=interface_entity))
                     logging.info(f"Processed interface: ap0")
                 for interface in device.get("interfaces", []):
                     try:
-                        interface_data = Interface(
+                        interface_entity = Interface(
                             name=interface.get("name"),
                             mac=interface.get("macAddress"),
                             description=interface.get("description"),
@@ -89,8 +90,8 @@ def prepare_data(merged_data):
                             mtu=interface.get("mtu"),
                             tags=["Diode-CATC-Agent"],
                         )
-                        entities.append(Entity(interface=interface_data))
-                        logging.info(f"Processed interface: {interface_data.name}")
+                        entities.append(Entity(interface=interface_entity))
+                        logging.info(f"Processed interface: {interface_entity.name}")
 
                         # Process IPs for the interface
                         for ip in interface.get("ips", []):

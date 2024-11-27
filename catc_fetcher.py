@@ -92,10 +92,10 @@ def merge_data(client):
                 serial_number = member_device.get("serialNumber")
                 if serial_number in device_dict:
                     device = device_dict[serial_number]
-                    print(f"{device}")
                     device_id = device._id
+                    logging.info(f"Matched {device.hostname} to {site.name}")
                     interfaces = get_interfaces(client, device_id) if device_id else []
-
+                    logging.info(f"Found {len(interfaces)} interfaces for {device.hostname}")
                     # Update member device with complete details
                     member_device.update({
                         "site": site["name"],
