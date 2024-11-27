@@ -32,7 +32,7 @@ def get_device_data(client,logging):
         Extracts the site prefix from a hostname based on the patterns for Access Points and Routers/Switches.
         """
         #a-iptay-2-211j-ap9136i
-        ap_regex = r"^([a-z].+)-[^]+-ap[0-9a-z]{4,5}$"
+        ap_regex = r"^([a-z].+)-[^]+-ap[0-9a-z]{4,5}.*$"
         
         #AE-Newberry-C930024ps-18.clemson.edu
         rs_regex = r"^(.+)-C*\d{4,4}.+$"
@@ -105,7 +105,7 @@ def get_device_data(client,logging):
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
                 try:
-                    logging.info(f"Fetching interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
+                    logging.info(f"Retrieving interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])
                 except:
                     logging.debug(f"No interfaces found for device {device['hostname']}")
