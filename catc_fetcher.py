@@ -45,7 +45,7 @@ def get_device_data(client):
     
     response = client.devices.get_device_count()
     device_count = response['response']
-    logging.info('Number of devices managed by Cisco Catalyst Center: ' + str(device_count))
+    logging.info(f'Retrieving {device_count} devices from Cisco Catalyst Center')
     offset = 1
     limit = 500
     device_list = []
@@ -61,7 +61,7 @@ def get_device_data(client):
 
     response = client.sites.get_site_count()
     site_count = response['response']    
-    logging.info('Number of sites managed by Cisco Catalyst Center: ' + str(site_count))
+    logging.info(f'Retrieving {site_count} sites from Cisco Catalyst Center')
     offset = 1
     limit = 500
     site_list = []
@@ -71,7 +71,7 @@ def get_device_data(client):
         offset += limit
         site_list.extend(response['response'])
         items += limit
-        logging.info(f"Retrieved {items} sites")
+        logging.debug(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
     
     device_inventory = []
@@ -83,7 +83,7 @@ def get_device_data(client):
         items += 1         
         
         try:
-            logging.debug(f"Fetching site name for device #{items}/{str(device_count)}: {device['hostname']}")
+            logging.debug(f"Retrieving site name for device #{items}/{str(device_count)}: {device['hostname']}")
             site_prefix = _extract_site_name(device['hostname'])
             hostname = device.get('hostname')
             if site_prefix in site_cache:
