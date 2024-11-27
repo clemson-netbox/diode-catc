@@ -89,7 +89,9 @@ def prepare_data(devices,logging):
             
             else:
                     
-                for interface in device.get("interfaces", []):
+                for interface_data in device.get("interfaces", []):
+                    print(f"{interface}")
+                    interface = interface_data.response
                     try:
                         interface_entity = Interface(
                             name=interface.get("name"),
