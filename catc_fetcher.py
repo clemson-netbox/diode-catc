@@ -8,7 +8,7 @@ def get_device_data(client):
         """
         Extracts the site name prefix from the hostname.
         """
-        match = re.match(r'^(.*?)-\d{3,3}.*$', hostname)
+        match = re.match(r'^(.*?)-\dC*{3,4}.*$', hostname)
         if match:
             return match.group(1)
         return hostname
