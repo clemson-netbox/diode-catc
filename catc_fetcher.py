@@ -85,12 +85,12 @@ def get_device_data(client,logging):
             hostname = device.get('hostname')
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
-                logging.info(f"Using cached site name for {site_prefix} {hostname}: {device.site}")
+                logging.info(f"Using cache {site_prefix} {hostname}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
                 site_cache[site_prefix] = device.site
-                logging.info(f"Caching site name {device.site} for prefix {site_prefix}")
+                logging.info(f"CACHING prefix {site_prefix}")
                 
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
