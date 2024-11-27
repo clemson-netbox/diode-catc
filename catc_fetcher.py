@@ -6,11 +6,9 @@ def get_device_data(client):
     device_count = response['response']
     logging.info('Number of devices managed by Cisco Catalyst Center: ' + str(device_count))
 
-    # get the device info list
     offset = 1
     limit = 500
     device_list = []
-    interfaces = []
     items=0
     while offset <= device_count:
         response = client.devices.get_device_list(offset=offset)
@@ -21,8 +19,10 @@ def get_device_data(client):
     logging.info('Collected complete device list from Cisco Catalyst Center')
 
     device_inventory = []
+    
     for device in device_list:
-
+        interfaces = []
+        
         response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
         site = response['response']['location']
         device.update({'site': site})
