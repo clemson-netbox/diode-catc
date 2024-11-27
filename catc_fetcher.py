@@ -3,6 +3,30 @@ import re
 
 def get_device_data(client):
 
+    SITE_CACHE_FILE = "site_cache.json"
+
+    def _load_site_cache():
+        """
+        Loads the site cache from a JSON file if it exists.
+        """
+        if os.path.exists(SITE_CACHE_FILE):
+            with open(SITE_CACHE_FILE, "r") as file:
+                try:
+                    site_cache = json.load(file)
+                    logging.info(f"Loaded site cache from {SITE_CACHE_FILE}")
+                    return site_cache
+                except json.JSONDecodeError as e:
+                    logging.warning(f"Could not decode site cache file: {e}")
+        return {}  # Return an empty cache if the file doesn't exist or is invalid
+
+
+    def _save_site_cache(site_cache):
+        """
+        Saves the site cache to a JSON file.
+        """
+        with open(SITE_CACHE_FILE, "w") as file:
+            json.dump(site_cache, file, indent=4)
+            logging.info(f"Saved site cache to {SITE_CACHE_FILE}")
 
     def _extract_site_name(hostname):
         """
@@ -50,7 +74,7 @@ def get_device_data(client):
     
     device_inventory = []
     items=0
-    site_cache = {}
+    site_cache = _load_site_cache()  # Load cache at startup
     
     for device in device_list:
         interfaces = []   
@@ -91,5 +115,5 @@ def get_device_data(client):
         device.interfaces=interfaces
         
         device_inventory.append(device)
-        
+    _save_site_cache(site_cache)  # Save cache at the end of processing
     return device_inventory
