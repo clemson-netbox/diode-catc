@@ -38,13 +38,13 @@ def prepare_data(merged_data):
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(device=device_entity))
-                logging.info(f"Processed device: {device.name}")
+                logging.info(f"Processed device: {device.hostname}")
 
                 # Process interfaces for the device
-                if 'Unified AP' in device['family']:
+                if 'Unified AP' in device.family:
                     interface_entity = Interface(
                             name='mgmt0',
-                            mac=device.get("macAddress"),
+                            mac_address=device.get("macAddress"),
                             device=device, 
                             description="AP Mgmt Interface",
                             type="1000base-t",
@@ -66,7 +66,7 @@ def prepare_data(merged_data):
                     interface_entity = Interface(
                             name='radio0',
                             device=device, 
-                            mac=device.get("apEthernetMacAddress"),
+                            mac_address=device.get("apEthernetMacAddress"),
                             description="AP Radio",
                             type='wireless',
                             enabled=True,
@@ -74,11 +74,12 @@ def prepare_data(merged_data):
                         )
                     entities.append(Entity(interface=interface_entity))
                     logging.info(f"Processed interface: ap0")
+                    
                 for interface in device_data.get("interfaces", []):
                     try:
                         interface_entity = Interface(
                             name=interface.get("name"),
-                            mac=interface.get("macAddress"),
+                            ma_address=interface.get("macAddress"),
                             description=interface.get("description"),
                             type=transformer.infer_interface_type(
                                 interface.get("name"), interface.get("speed")
