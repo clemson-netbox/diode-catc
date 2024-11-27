@@ -115,7 +115,7 @@ def get_device_data(client):
         interfaces.extend(response['response'])  
         logging.debug(f"Found {len(interfaces)} interfaces for {device['hostname']}")
         device.interfaces=interfaces
-        
+        _save_site_cache(site_cache)  # Save cache at the end of processing
+
         device_inventory.append(device)
-    _save_site_cache(site_cache)  # Save cache at the end of processing
     return device_inventory
