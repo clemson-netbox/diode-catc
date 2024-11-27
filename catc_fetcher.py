@@ -33,7 +33,6 @@ def get_device_data(client):
         items += limit
         logging.info(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
-    items=0
     site_sn={}
     logging.info('Retrieving device locations')
     for site in site_list:
@@ -44,10 +43,7 @@ def get_device_data(client):
         for device_entry in devices_response:
             device_list = device_entry.get('response', [])
             for device in device_list:
-                items += 1
                 site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
-                if items % 500 == 0:
-                    logging.info(f"Processed {items}/{str(device_count)} devices ")
     
                 #logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialNumber')}")
     logging.info('Collected complete device mapping list from Cisco Catalyst Center')
@@ -60,10 +56,17 @@ def get_device_data(client):
 
         interfaces = []
     
-        logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
+        logging.info(f"Fetching interfaeces for device #{items}/{str(device_count)}: {device['hostname']}")
         if 'serialNumber' not in device:
+            logging.warning(f"Serial number not found on device. Skipping device {device['hostname']}.")
+
             continue
         
+        serial_number = device['serialNumber']
+        if serial_number not in site_sn:
+            logging.warning(f"Serial number {serial_number} not found in site mapping. Skipping device {device['hostname']}.")
+            continue
+            
         print(f"{site_sn[device.serialNumber]} - {device['hostname']}")   
         device.site=site_sn[device.serialNumber]  
         
