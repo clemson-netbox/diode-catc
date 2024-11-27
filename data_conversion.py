@@ -90,8 +90,8 @@ def prepare_data(devices,logging):
             else:
                     
                 for interface_data in device.get("interfaces", []):
-                    logging.info(f"{interface}")
                     interface = interface_data.response
+                    logging.info(f"{interface}")
                     try:
                         interface_entity = Interface(
                             name=interface.get("name"),
