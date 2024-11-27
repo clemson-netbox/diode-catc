@@ -2,6 +2,19 @@ import logging
 
 def get_device_data(client):
 
+
+    def _extract_site_name(hostname):
+        """
+        Extracts the site name prefix from the hostname.
+        """
+        if '-' in hostname:
+            parts = hostname.split('-')
+            return '-'.join(parts[:-2])
+        elif '.' in hostname:
+            parts = hostname.split('.')
+            return '-'.join(parts[:-2])
+        return hostname  # Return full hostname if no clear separator
+
     response = client.devices.get_device_count()
     device_count = response['response']
     logging.info('Number of devices managed by Cisco Catalyst Center: ' + str(device_count))
@@ -33,20 +46,50 @@ def get_device_data(client):
         logging.info(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
     
-    site_sn={}
+    site_sn = {}
+    site_cache = {}  # Cache for inferred site names
+
     logging.info('Retrieving device locations')
     for site in site_list:
-        #if site['siteNameHierarchy'] == 'Global': continue
-        #logging.info(f"Processing site = {site['siteNameHierarchy']}")
-        response=client.sites.get_membership(site_id=site.id)
-        devices_response = response.get('device', [])
-        for device_entry in devices_response:
-            devices = device_entry.get('response', [])
-            for device in devices:
-                site_sn[device.get('serialNumber')]=site['siteNameHierarchy']
-                logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialNumber')}")
+        # Skip the Global site if necessary
+        # if site['siteNameHierarchy'] == 'Global': continue
+
+        try:
+            logging.info(f"Processing site: {site['siteNameHierarchy']}")
+            response = client.sites.get_membership(site_id=site.id)
+            devices_response = response.get('device', [])
+
+            for device_entry in devices_response:
+                devices = device_entry.get('response', [])
+
+                for device in devices:
+                    serial_number = device.get('serialNumber')
+                    hostname = device.get('hostname')
+
+                    # Infer site name from hostname and cache it
+                    if hostname:
+                        site_prefix = _extract_site_name(hostname)
+                        if site_prefix in site_cache:
+                            inferred_site = site_cache[site_prefix]
+                            logging.info(f"Using cached site name for {hostname}: {inferred_site}")
+                        else:
+                            inferred_site = site['siteNameHierarchy']
+                            site_cache[site_prefix] = inferred_site
+                            logging.info(f"Caching site name {inferred_site} for prefix {site_prefix}")
+
+                        # Assign the inferred site name
+                        site_sn[serial_number] = inferred_site
+
+                    else:
+                        # Fallback to current site name if no hostname
+                        site_sn[serial_number] = site['siteNameHierarchy']
+                        logging.info(f"Assigning {site['siteNameHierarchy']} to device with SN {serial_number}")
+
+        except Exception as e:
+            logging.error(f"Error processing site {site['siteNameHierarchy']}: {e}")
+
     logging.info('Collected complete device mapping list from Cisco Catalyst Center')
-               
+                
     device_inventory = []
     items=0
     
