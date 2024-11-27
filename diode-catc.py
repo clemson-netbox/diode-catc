@@ -103,7 +103,7 @@ def main():
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
             device_entities = prepare_data(devices,logging)
-            logging.info(f"Transformed {len(device_entities)} devices.")
+            logging.info(f"Created {len(device_entities)} diode entities.")
 
             # Ingest data into Diode
             logging.info("Ingesting data into Diode...")

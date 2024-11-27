@@ -128,5 +128,4 @@ def prepare_data(devices,logging):
                 f"Error processing device {device.get('hostname', 'unknown')}: {device_error}"
             )
 
-    logging.info(f"Completed transformation for devices in {len(devices)} sites.")
     return entities
