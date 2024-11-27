@@ -9,10 +9,7 @@ def get_device_data(client):
         """
         if '-' in hostname:
             parts = hostname.split('-')
-            return '-'.join(parts[:-2])
-        elif '.' in hostname:
-            parts = hostname.split('.')
-            return '-'.join(parts[:-2])
+            return '-'.join(parts[:-3])
         return hostname  # Return full hostname if no clear separator
 
     response = client.devices.get_device_count()
