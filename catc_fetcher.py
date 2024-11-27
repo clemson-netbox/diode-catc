@@ -4,7 +4,7 @@ import json
 
 def get_device_data(client,logging):
 
-    SITE_CACHE_FILE = "/opt/clemson/docker/o11y/diode/diode-catc/site_cache.json"
+    SITE_CACHE_FILE = "./site_cache.json"
 
     def _load_site_cache():
         """
