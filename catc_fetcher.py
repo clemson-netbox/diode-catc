@@ -44,9 +44,14 @@ def get_device_data(client):
         for device_entry in devices_response:
             device_list = device_entry.get('response', [])
             for device in device_list:
+                items += 1
                 site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
-                logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialnumber')}")
-        
+                if items % 500 == 0:
+                    logging.info(f"Processed {items}/{str(device_count)} devices ")
+    
+                #logging.info(f"Assigning {site['siteNameHierarchy']} to {device.get('hostname')}/SN {device.get('serialNumber')}")
+    logging.info('Collected complete device mapping list from Cisco Catalyst Center')
+               
     device_inventory = []
         
     items=0
