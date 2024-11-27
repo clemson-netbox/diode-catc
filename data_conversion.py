@@ -21,13 +21,14 @@ def prepare_data(merged_data):
                 if device.get("snmpLocation"):
                     location = device["snmpLocation"]
 
+                #TODO: Handle stackwise
                 device_data = Device(
                     name=transformer.transform_name(device.get("hostname")),
                     device_type=transformer.transform_device_type(device.get("platformId")),
                     manufacturer="Cisco",
                     role=f"{device.get('family')} - {transformer.transform_role(device.get('role'))}",
                     platform=transformer.transform_platform(
-                        device.get("softwareType"), device.get("softwareVersion")
+                        device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                     ),
                     serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
                     site=site_name,
