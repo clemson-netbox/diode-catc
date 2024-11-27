@@ -4,29 +4,22 @@ import json
 
 def get_device_data(client,logging):
 
-    SITE_CACHE_FILE = "/site_cache.json"
+    SITE_CACHE_FILE = "./site_cache.json"
 
     def _load_site_cache():
-        """
-        Loads the site cache from a JSON file if it exists.
-        """
         if os.path.exists(SITE_CACHE_FILE):
-            with open(SITE_CACHE_FILE, "w") as file:
+            with open(SITE_CACHE_FILE, "r") as file:
                 try:
                     site_cache = json.load(file)
                     logging.debug(f"Loaded site cache from {SITE_CACHE_FILE}")
                     return site_cache
                 except json.JSONDecodeError as e:
                     logging.warning(f"Could not decode site cache file: {e}")
-                    
+      
+        logging.debug(f"No cache found at {SITE_CACHE_FILE}")                    
         return {}  # Return an empty cache if the file doesn't exist or is invalid
 
-
-
     def _save_site_cache(site_cache):
-        """
-        Saves the site cache to a JSON file.
-        """
         try:
             with open(SITE_CACHE_FILE, "w") as file:
                 json.dump(site_cache, file, indent=4)
