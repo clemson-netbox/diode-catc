@@ -23,10 +23,7 @@ def get_device_data(client,logging):
         try:
             with open(SITE_CACHE_FILE, "w") as file:
                 json.dump(site_cache, file, indent=4)
-                logging.debug
-                
-                
-                (f"Saved site cache to {SITE_CACHE_FILE}")
+                logging.debug(f"Saved site cache to {SITE_CACHE_FILE}")
         except Exception as e:
             logging.error(f"Failed to save site cache: {e}")
 
