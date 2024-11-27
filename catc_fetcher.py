@@ -92,7 +92,8 @@ def merge_data(client):
                 serial_number = member_device.get("serialNumber")
                 if serial_number in device_dict:
                     device = device_dict[serial_number]
-                    device_id = device.id
+                    print(f"{device}")
+                    device_id = device._id
                     interfaces = get_interfaces(client, device_id) if device_id else []
 
                     # Update member device with complete details
