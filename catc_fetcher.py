@@ -1,9 +1,8 @@
-import logging
 import re
 import os
 import json
 
-def get_device_data(client):
+def get_device_data(client,logging):
 
     SITE_CACHE_FILE = "site_cache.json"
 

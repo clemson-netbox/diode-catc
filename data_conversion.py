@@ -1,9 +1,8 @@
 from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Entity
 from transformer import Transformer
-import logging
 
 
-def prepare_data(devices):
+def prepare_data(devices,logging):
     
     transformer = Transformer()
     entities = []

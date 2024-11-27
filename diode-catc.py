@@ -60,7 +60,7 @@ def parse_arguments():
 
     parser.add_argument(
         "--log-level",
-        default=os.getenv("LOG_LEVEL", "INFO")
+        default=os.getenv("LOG_LEVEL", "INFO"),
         help="Logging Level INFO, WARNING, ERROR, DEBUG"
     )
 
@@ -92,31 +92,18 @@ def main():
             app_name="diode-catc",
             app_version=__version__,
         ) as client:
+            
             logging.info("Successfully connected to Diode.")
 
             # Fetch data from Catalyst Center
             logging.info("Fetching device data from Catalyst Center...")
-            devices = get_device_data(catc)
+            devices = get_device_data(catc,logging)
             logging.info(f"Fetched {len(devices)} devices.")
-
-            # logging.info("Fetching interface data for all devices...")
-            # interfaces = []
-            # for device in devices:
-            #     device_interfaces = fetch_interface_data(catc, device["id"])
-            #     interfaces.extend(device_interfaces)
-            #     logging.info(f"Fetched {len(device_interfaces)} interfaces for device {device['hostname']}.")
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
-            device_entities = prepare_data(devices)
+            device_entities = prepare_data(devices,logging)
             logging.info(f"Transformed {len(device_entities)} devices.")
-
-            # logging.info("Transforming interface data into Diode-compatible format...")
-            # interface_entities = [
-            #     entity for iface in interfaces
-            #     for entity in prepare_interface_data(iface)
-            # ]
-            # logging.info(f"Transformed {len(interface_entities)} interfaces.")
 
             # Ingest data into Diode
             logging.info("Ingesting data into Diode...")
