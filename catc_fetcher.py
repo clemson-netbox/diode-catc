@@ -42,9 +42,9 @@ def get_device_data(client):
         response=client.sites.get_membership(site_id=site.id)
         logging.info(f"Devices: {response}")
         if 'device' in response:
-            for device in response.device:
-                site_sn[device.response.get('serialnumber')]=site['siteNameHierarchy']
-                logging.info(f"Assigning {site['siteNameHierarchy']} to Serial #{device.response.get('serialnumber')}")
+            for device in response.response:
+                site_sn[device.get('serialnumber')]=site['siteNameHierarchy']
+                logging.info(f"Assigning {site['siteNameHierarchy']} to Serial #{device.get('serialnumber')}")
         
     device_inventory = []
         
