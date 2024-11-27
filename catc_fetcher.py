@@ -34,6 +34,14 @@ def get_device_data(client):
         logging.info(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
 
+    logging.info('Retrieving device locations')
+    for site in site_list:
+        response=client.sites.get_membership(siteid=site.id)
+        for device in response.device:
+            site[device.response.get('serialnumber')]=site['siteNameHierarchy']
+            logging.info(f"Assigning {site['siteNameHierarchy']} to Serial #{device.response.get('serialnumber')}")
+        
+
     device_inventory = []
         
     items=0
@@ -45,6 +53,9 @@ def get_device_data(client):
         logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']}")
         if 'serialNumber' not in device:
             continue
+    
+        for site in site_list:
+            
         
         try:
             if not 'Unified AP' in device.family:
