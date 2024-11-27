@@ -58,6 +58,12 @@ def parse_arguments():
         help="Verify Catalyst Center SSL certificate (default: true, or set via CATC_VERIFY environment variable)"
     )
 
+    parser.add_argument(
+        "--log-level",
+        default=os.getenv("LOG_LEVEL", "INFO")
+        help="Logging Level INFO, WARNING, ERROR, DEBUG"
+    )
+
     return parser.parse_args()
 
 
@@ -67,7 +73,7 @@ def main():
 
     # Configure logging
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.args.log_level,
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
