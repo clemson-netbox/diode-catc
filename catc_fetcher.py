@@ -33,7 +33,7 @@ def get_device_data(client):
         items += limit
         logging.info(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
-
+    items=0
     site_sn={}
     logging.info('Retrieving device locations')
     for site in site_list:
