@@ -15,7 +15,7 @@ def get_device_data(client):
             with open(SITE_CACHE_FILE, "r") as file:
                 try:
                     site_cache = json.load(file)
-                    logging.info(f"Loaded site cache from {SITE_CACHE_FILE}")
+                    logging.debug(f"Loaded site cache from {SITE_CACHE_FILE}")
                     return site_cache
                 except json.JSONDecodeError as e:
                     logging.warning(f"Could not decode site cache file: {e}")
@@ -28,7 +28,7 @@ def get_device_data(client):
         """
         with open(SITE_CACHE_FILE, "w") as file:
             json.dump(site_cache, file, indent=4)
-            logging.info(f"Saved site cache to {SITE_CACHE_FILE}")
+            logging.debug(f"Saved site cache to {SITE_CACHE_FILE}")
 
     def _extract_site_name(hostname):
         """
@@ -55,7 +55,7 @@ def get_device_data(client):
         offset += limit
         device_list.extend(response['response'])
         items += limit
-        logging.info(f"Retrieved {items} devices")
+        logging.debug(f"Retrieved {items} devices")
     logging.info('Collected complete device list from Cisco Catalyst Center')
 
 
@@ -83,17 +83,17 @@ def get_device_data(client):
         items += 1         
         
         try:
-            logging.info(f"Fetching site name for device #{items}/{str(device_count)}: {device['hostname']}")
+            logging.debug(f"Fetching site name for device #{items}/{str(device_count)}: {device['hostname']}")
             site_prefix = _extract_site_name(device['hostname'])
             hostname = device.get('hostname')
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
-                logging.info(f"Using cached site name for {hostname}: {device.site}")
+                logging.debug(f"Using cached site name for {hostname}: {device.site}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
                 site_cache[site_prefix] = device.site
-                logging.info(f"Caching site name {device.site} for prefix {site_prefix}")
+                logging.debug(f"Caching site name {device.site} for prefix {site_prefix}")
                 
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
@@ -101,7 +101,7 @@ def get_device_data(client):
                     logging.info(f"Fetching interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])
                 except:
-                    logging.info(f"No interfaces found for device {device['hostname']}")
+                    logging.warning(f"No interfaces found for device {device['hostname']}")
                     device_inventory.append(device)
                     continue
             else:
@@ -113,7 +113,7 @@ def get_device_data(client):
             continue
         
         interfaces.extend(response['response'])  
-        logging.info(f"Found {len(interfaces)} interfaces for {device['hostname']}")
+        logging.debug(f"Found {len(interfaces)} interfaces for {device['hostname']}")
         device.interfaces=interfaces
         
         device_inventory.append(device)
