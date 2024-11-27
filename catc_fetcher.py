@@ -86,7 +86,7 @@ def get_device_data(client,logging):
     
     for device in device_list:
         interfaces = []   
-        items += 1         
+        items += 1          
         
         try:
             hostname = device.get('hostname')
@@ -94,14 +94,14 @@ def get_device_data(client,logging):
             site_prefix = _extract_site_name(hostname)
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
-                logging.info(f"Using cache {site_prefix}: {device.site}")
+                logging.debug (f"Using cache {site_prefix}: {device.site}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
                 logging.debug(f"Cache Miss: {hostname}: {device.site}")
                 if site_prefix != hostname:
                     site_cache[site_prefix] = device.site
-                    logging.info(f"CACHING prefix {site_prefix}")
+                    logging.debug(f"CACHING prefix {site_prefix}")
                     _save_site_cache(site_cache) 
                 
             #AP have no interfaces in CATC    

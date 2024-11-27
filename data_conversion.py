@@ -51,6 +51,8 @@ def prepare_data(devices,logging):
             entities.append(Entity(device=device_entity))
             logging.info(f"Processed device: {device.hostname}")
 
+            logging.info(f"Processing interfaces and IPs for device: {device.hostname}")
+
             # Process interfaces for the device
             if 'Unified AP' in device.family:
                 interface_entity = Interface(
@@ -71,7 +73,7 @@ def prepare_data(devices,logging):
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
-                logging.info(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
+                logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
                 interface_entity = Interface(
                         name='radio0',
@@ -83,7 +85,7 @@ def prepare_data(devices,logging):
                         tags=["Diode-CATC-Agent"],
                     )
                 entities.append(Entity(interface=interface_entity))
-                logging.info(f"Processed AP interface: radio0")
+                logging.debug(f"Processed AP interface: radio0")
             
             else:
                     
@@ -102,7 +104,7 @@ def prepare_data(devices,logging):
                             tags=["Diode-CATC-Agent"],
                         )
                         entities.append(Entity(interface=interface_entity))
-                        logging.info(f"Processed interface: {interface_entity.name}")
+                        logging.debug(f"Processed interface: {interface_entity.name}")
 
                         # Process IPs for the interface
                         for ip in interface.get("ips", []):
@@ -114,7 +116,7 @@ def prepare_data(devices,logging):
                                     tags=["Diode-CATC-Agent"],
                                 )
                                 entities.append(Entity(ip_address=ip_data))
-                                logging.info(f"Processed {interface_entity.name} IP: {ip}")
+                                logging.debug(f"Processed {interface_entity.name} IP: {ip}")
                             except Exception as ip_error:
                                 logging.error(f"Error processing IP {ip}: {ip_error}")
 
