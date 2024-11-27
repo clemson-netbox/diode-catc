@@ -33,7 +33,7 @@ def prepare_data(devices):
             if device.get("snmpLocation"):
                 location = device["snmpLocation"]
 
-            #TODO: Handle stackwise
+            #TODO: Handle stackwise when multi serial#s
             device_entity = Device(
                 name=transformer.transform_name(device.get("hostname")),
                 device_type=transformer.transform_device_type(device.get("platformId")),
@@ -44,7 +44,8 @@ def prepare_data(devices):
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
                 site=transformer.transform_location(device_data.get("site")),
-                # location=location,  # TODO: Uncomment when Diode adds location to device
+                # location=location,  
+                # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
                 tags=["Diode-CATC-Agent"],
             )
@@ -60,7 +61,6 @@ def prepare_data(devices):
                         description="AP Mgmt Interface",
                         type="1000base-t",
                         speed=1000000, 
-                        duplex='full',
                         enabled=True,
                         tags=["Diode-CATC-Agent"],
                     )
@@ -96,7 +96,6 @@ def prepare_data(devices):
                             interface.get("name"), interface.get("speed")
                         ),
                         speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
-                        duplex=transformer.map_duplex(interface.get("duplex")),
                         enabled=interface.get("status", "").lower()
                         in ["connected", "up", "reachable"],
                         mtu=interface.get("mtu"),
