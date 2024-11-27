@@ -32,10 +32,10 @@ def get_device_data(client,logging):
         Extracts the site prefix from a hostname based on the patterns for Access Points and Routers/Switches.
         """
         #a-iptay-2-211j-ap9136i
-        ap_regex = r"^([a-z].+)-ap[0-9a-z]{4,5}$"
+        ap_regex = r"^([a-z].+)-[^]+-ap[0-9a-z]{4,5}$"
         
         #AE-Newberry-C930024ps-18.clemson.edu
-        rs_regex = r"^(.+)-C*\d{3,}[^-]+$"
+        rs_regex = r"^(.+)-C*\d{4,4}.+$"
 
         # Check Access Points
         ap_match = re.match(ap_regex, hostname)
@@ -47,8 +47,7 @@ def get_device_data(client,logging):
         if rs_match:
             return rs_match.group(1)
 
-        # If no match, return None or hostname as fallback
-        return None
+        return hostname
     
     response = client.devices.get_device_count()
     device_count = response['response']
