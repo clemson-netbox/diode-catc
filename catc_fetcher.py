@@ -22,24 +22,24 @@ def get_device_data(client):
 
     device_inventory = []
     for device in device_list:
-        device_details = {'hostname': device['hostname']}
-        device_details.update({'device_ip': device['managementIpAddress']})
-        device_details.update({'device_id': device['id']})
-        device_details.update({'version': device['softwareVersion']})
-        device_details.update({'device_family': device['type']})
-        device_details.update({'role': device['role']})
 
         # get the device site hierarchy
         response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
         site = response['response']['location']
-        device_details.update({'site': site})
+        device.update({'site': site})
         logging.info(f"Collected site {site} for {device['hostname']}")
 
-        # get the site id
-        response = client.devices.get_interface_info_by_id(device_id=device['id'])
+        try:
+            response = client.devices.get_interface_info_by_id(device_id=device['id'])
+        except:
+            logging.error("No interfaces found for device {device['hostname']}")
+            
         interfaces.extend(response['response'])  
         for interface in interfaces:
             logging.info(f"Collected interface {interface.portName} for {device['hostname']}")
-        device_inventory.append(device_details)
+        device.interfaces=interfaces
+        
+        device_inventory.append(device)
         
     logging.info('Collected the device inventory from Cisco DNA Center')
+    return device_inventory
