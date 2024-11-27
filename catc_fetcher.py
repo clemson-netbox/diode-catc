@@ -49,6 +49,7 @@ def get_sites_with_devices(client):
 def get_device_details(client):
 
     devices = get_paginated_objects(client.devices.get_device_list, "devices")
+    print(f"{devices}")
     return {device.response.serialNumber: device.response for device in devices}
 
 def get_interfaces(client, device_id):
