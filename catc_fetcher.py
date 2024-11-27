@@ -29,16 +29,23 @@ def get_device_data(client,logging):
 
     def _extract_site_name(hostname):
         """
-        Extracts the site name prefix from the hostname.
+        Extracts the site prefix from a hostname based on the patterns for Access Points and Routers/Switches.
         """
-        match = re.match(r'^(.+?)-[^ap][^-]+$', hostname)
-        if match:
-            return match.group(1)
-        else:
-            match = re.match(r'^([a-z]-.+)-[^-]+-ap[^-]+$', hostname)
-            if match:
-                return match.group(1)
-        return hostname
+        ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}$"
+        rs_regex = r"^(.*)-C?[0-9]+[a-zA-Z0-9-]*$"
+
+        # Check Access Points
+        ap_match = re.match(ap_regex, hostname)
+        if ap_match:
+            return ap_match.group(1)
+
+        # Check Routers/Switches
+        rs_match = re.match(rs_regex, hostname)
+        if rs_match:
+            return rs_match.group(1)
+
+        # If no match, return None or hostname as fallback
+        return None
     
     response = client.devices.get_device_count()
     device_count = response['response']
@@ -85,7 +92,7 @@ def get_device_data(client,logging):
             hostname = device.get('hostname')
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
-                logging.info(f"Using cache {site_prefix} {hostname}")
+                logging.info(f"Using cache {site_prefix}: {device.site}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
