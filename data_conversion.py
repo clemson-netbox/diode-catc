@@ -16,9 +16,9 @@ def prepare_data(merged_data):
             try:
                 # Transform device fields
                 device=device_data.details
-                location = transformer.transform_location(device.get("siteNameHierarchy"))
+                location = transformer.transform_location(device_data.get("site"))
                 if len(location) < 1:
-                    location = transformer.transform_site(device.get("siteNameHierarchy"))
+                    location = transformer.transform_location(device_data.get("site"))
                 if device.get("snmpLocation"):
                     location = device["snmpLocation"]
 
