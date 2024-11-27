@@ -34,7 +34,7 @@ def get_device_data(client):
         logging.info(f"Retrieved {items} sites")
     logging.info('Collected complete site list from Cisco Catalyst Center')
 
-    site_sn=[]
+    site_sn={}
     logging.info('Retrieving device locations')
     for site in site_list:
         if site['siteNameHierarchy'] == 'Global': continue
