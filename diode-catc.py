@@ -73,7 +73,7 @@ def main():
 
     # Configure logging
     logging.basicConfig(
-        level=logging.args.log_level,
+        level=args.log_level,
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
