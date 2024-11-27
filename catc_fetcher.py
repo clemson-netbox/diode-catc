@@ -32,6 +32,8 @@ def get_device_data(client):
             response = client.devices.get_interface_info_by_id(device_id=device['id'])
         except:
             logging.error(f"No interfaces found for device {device['hostname']}")
+            device_inventory.append(device)
+            continue
             
         interfaces.extend(response['response'])  
         for interface in interfaces:
