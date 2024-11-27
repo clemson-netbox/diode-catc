@@ -19,14 +19,15 @@ def get_device_data(client):
     logging.info('Collected complete device list from Cisco Catalyst Center')
 
     device_inventory = []
-    
+        
+    items=0
     for device in device_list:
         interfaces = []
         
         response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
         site = response['response']['location']
         device.update({'site': site})
-        logging.info(f"Found {device['hostname']} in {site}")
+        logging.info(f"Found device #{items}/{str(device_count)}: {device['hostname']} in {site}")
 
         try:
             response = client.devices.get_interface_info_by_id(device_id=device['id'])
@@ -40,5 +41,6 @@ def get_device_data(client):
         device.interfaces=interfaces
         
         device_inventory.append(device)
+        items += 1
         
     return device_inventory
