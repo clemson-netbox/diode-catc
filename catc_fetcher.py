@@ -11,13 +11,14 @@ def get_device_data(client,logging):
         Loads the site cache from a JSON file if it exists.
         """
         if os.path.exists(SITE_CACHE_FILE):
-            with open(SITE_CACHE_FILE, "r") as file:
+            with open(SITE_CACHE_FILE, "w") as file:
                 try:
                     site_cache = json.load(file)
                     logging.debug(f"Loaded site cache from {SITE_CACHE_FILE}")
                     return site_cache
                 except json.JSONDecodeError as e:
                     logging.warning(f"Could not decode site cache file: {e}")
+                    
         return {}  # Return an empty cache if the file doesn't exist or is invalid
 
 
