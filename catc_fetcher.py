@@ -4,7 +4,7 @@ import json
 
 def get_device_data(client,logging):
 
-    SITE_CACHE_FILE = "./site_cache.json"
+    SITE_CACHE_FILE = "/opt/clemson/docker/o11y/diode/diode-catc/site_cache.json"
 
     def _load_site_cache():
         """
@@ -22,13 +22,17 @@ def get_device_data(client,logging):
         return {}  # Return an empty cache if the file doesn't exist or is invalid
 
 
+
     def _save_site_cache(site_cache):
         """
         Saves the site cache to a JSON file.
         """
-        with open(SITE_CACHE_FILE, "w") as file:
-            json.dump(site_cache, file, indent=4)
-            logging.debug(f"Saved site cache to {SITE_CACHE_FILE}")
+        try:
+            with open(SITE_CACHE_FILE, "w") as file:
+                json.dump(site_cache, file, indent=4)
+                logging.info(f"Saved site cache to {SITE_CACHE_FILE}")
+        except Exception as e:
+            logging.error(f"Failed to save site cache: {e}")
 
     def _extract_site_name(hostname):
         """
