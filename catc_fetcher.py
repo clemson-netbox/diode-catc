@@ -96,11 +96,11 @@ def get_device_data(client,logging):
             site_prefix = _extract_site_prefix(hostname)
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
-                logging.debug (f"Using cache {site_prefix}: {device.site}")
+                logging.debug(f"Using cache {site_prefix}: {device.site}")
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
-                logging.debug(f"Cache Miss: {hostname}: {device.site}")
+                logging.warning(f"Cache Miss: {hostname}: {device.site}")
                 if site_prefix != hostname:
                     site_cache[site_prefix] = device.site
                     logging.debug(f"CACHING prefix {site_prefix}")
