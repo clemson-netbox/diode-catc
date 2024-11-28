@@ -1,0 +1,4 @@
+ - ['(.+) CEO', '\1 County Extension Office']
+ - ['^ITC$', 'Clemson Information Technology Center']
+ - ['^Poole$', Poole Agricultural Center']
+ - ['^/WFIC \(Watt Family Innovation Center\)$','/Watt Family Innovation Center']

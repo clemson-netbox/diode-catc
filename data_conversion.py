@@ -4,7 +4,7 @@ from transformer import Transformer
 
 def prepare_data(devices,logging):
     
-    transformer = Transformer()
+    transformer = transformer = Transformer("includes/site_rules.yml"),
     entities = []
 
     
@@ -24,14 +24,17 @@ def prepare_data(devices,logging):
 
     for device_data in devices:
         try:
-            # Transform device fields
+            
             device=device_data
-            location = transformer.transform_location(device_data.get("site"))
+            
+            location = transformer.extract_location(device_data.get("site"))
             if len(location) < 1:
-                location = transformer.transform_location(device_data.get("site"))
+                location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
             if device.get("snmpLocation"):
                 location = device["snmpLocation"]
 
+            site = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
+            
             #TODO: Handle stackwise when multi serial#s
             device_entity = Device(
                 name=transformer.transform_name(device.get("hostname")),
@@ -42,7 +45,7 @@ def prepare_data(devices,logging):
                     device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
-                site=transformer.transform_location(device_data.get("site")),
+                site=site,
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),

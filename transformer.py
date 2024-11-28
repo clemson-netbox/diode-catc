@@ -3,7 +3,12 @@ import yaml
 import logging
 
 class Transformer:
-
+    def __init__(self, site_rules_path):
+        """
+        Initialize the Transformer with paths to regex rules for site and tenant mappings.
+        """
+        self.site_rules = self._load_rules(site_rules_path)
+        
     def transform_name(self,hostname):
         """
         Transforms hostname to name without the domain and converts to lowercase.
@@ -11,6 +16,19 @@ class Transformer:
         if not hostname:
             return None
         return hostname.lower().split(".clemson.edu")[0]
+
+    def apply_regex_replacements(self, value, rules):
+        for rule in rules:
+            # Validate rule structure
+            if len(rule) != 2:
+                logging.error(f"Malformed rule: {rule}")
+                continue
+
+            pattern, replacement = rule
+            if re.match(pattern, value, flags=re.IGNORECASE):
+                return re.sub(pattern, replacement, value, flags=re.IGNORECASE)
+
+        return value
 
     # Utility function for regex replacement
     def regex_replace(self, value, pattern, replacement):
@@ -30,6 +48,12 @@ class Transformer:
             return str(network)
         except ValueError:
             return None
+
+    def site_to_site(self, name):
+        """
+        Transform a host's cluster name to its site name.
+        """
+        return self.apply_regex_replacements(name, self.site_rules)
 
     def map_duplex(self,duplex):
         """
@@ -96,8 +120,8 @@ class Transformer:
         """
         if not role:
             return None
-        return role.title()
-
+        return self.regex_replace(role.tite(), r"and Hubs", r"")
+       
 
     def transform_platform(self, software_type, software_version):
         """
@@ -107,22 +131,24 @@ class Transformer:
         return f"{software_type} {software_version}"
 
 
-    def transform_site(self,site_hierarchy):
+    def extract_site(self,site_hierarchy):
         """
         Extracts the site name from the siteNameHierarchy.
         """
         if not site_hierarchy:
             return None
-        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        site = self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1").title()
+        return site
 
 
-    def transform_location(self,site_hierarchy):
+    def extract_location(self,site_hierarchy):
         """
         Extracts the location from the siteNameHierarchy.
         """
         if not site_hierarchy:
             return None
-        return self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1")
+        location = self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1").title()
+        return location
 
 
     def transform_status(self,reachability_status):
