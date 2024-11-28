@@ -145,7 +145,7 @@ def prepare_data(client,devices,logging):
                             f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                         )
             # Ingest data into Diode
-            logging.info(f"Ingesting device {device.hostname} data into Diode...")
+            logging.info(f"Ingesting device {device_name} data into Diode...")
             response = client.ingest(entities=entities)# + interface_entities)
             if response.errors:
                 logging.error(f"Errors during ingestion: {response.errors}")

@@ -68,11 +68,12 @@ class Transformer:
     def get_network_addr(self, ip, prefix_or_mask):
         try:
             if "." in ip:  # IPv4
-                return ipaddress.IPv4Network(f"{ip}/{prefix_or_mask}", strict=False).prefixlen
+                network = ipaddress.IPv4Network(f"{ip}/{prefix_or_mask}", strict=False)
+                return f"{network.network_address}/{network.prefixlen}"
             else:  # IPv6
                 prefix_length = int(prefix_or_mask)
                 network = ipaddress.IPv6Network(f"{ip}/{prefix_length}", strict=False)
-                return f"{network.network_address}/{prefix_length}"
+                return f"{network.network_address}/{network.prefixlen}"
         except Exception as e:
             print(f"Error calculating network address: {e}")
             return None
