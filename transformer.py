@@ -1,7 +1,7 @@
 import re
 import yaml
 import logging
-from ipaddress import ip_network
+import ipaddress
 
 class Transformer:
     def __init__(self, site_rules_path, skip_rules_path):
@@ -59,10 +59,26 @@ class Transformer:
 
     def get_cidr(self,ip, subnet_mask):
         try:
-            network = ip_network(f"{ip}/{subnet_mask}", strict=False)
+            network = ipaddress.ip_network(f"{ip}/{subnet_mask}", strict=False)
             return str(network)
         except ValueError:
-            logging.error(f"CIDR error {ip} {mask}: {e}")
+            logging.error(f"CIDR error {ip} {subnet_mask}: {e}")
+            return None
+
+    def get_network_addr(ip, prefix_or_mask):
+        try:
+            if "." in ip:  # IPv4
+                if "." in prefix_or_mask:  # If it's a subnet mask
+                    prefix_length = ipaddress.IPv4Network(f"0.0.0.0/{prefix_or_mask}").prefixlen
+                else:  # If it's already a prefix length
+                    prefix_length = int(prefix_or_mask)
+                network = ipaddress.IPv4Network(f"{ip}/{prefix_length}", strict=False)
+            else:  # IPv6
+                prefix_length = int(prefix_or_mask)
+                network = ipaddress.IPv6Network(f"{ip}/{prefix_length}", strict=False)
+            return f"{network.network_address}/{prefix_length}"
+        except Exception as e:
+            print(f"Error calculating network address: {e}")
             return None
 
     def site_to_site(self, name):

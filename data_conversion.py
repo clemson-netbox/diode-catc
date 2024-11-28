@@ -1,4 +1,4 @@
-from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Entity
+from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Prefix, Entity
 from transformer import Transformer
 
 
@@ -110,6 +110,7 @@ def prepare_data(client,devices,logging):
                         
                         logging.debug(f"Processed interface: {interface.get('portName')}")
 
+
                         try:
                             if interface.get('ipv4Address'):
                                 ip_data = IPAddress(
@@ -118,6 +119,15 @@ def prepare_data(client,devices,logging):
                                     description=f"{device.hostname} {interface.get('portName')} {interface.get('description')}",
                                     tags=["Diode-CATC-Agent"],
                                 )
+                                if 'Vlan' in interface.get('portName'):
+                                    prefix_entity = Prefix(
+                                        prefix=transformer.get_network_addr(transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask'))),
+                                        site = transformer.site_to_site(transformer.extract_site(device.get("site"))),
+                                        description = interface.get('description'),
+                                        status='active'
+                                    )
+                                    entities.append(Entity(prefix=prefix_entity))
+
                                 entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                                 

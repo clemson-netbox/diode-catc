@@ -102,7 +102,7 @@ def main():
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
-            prepare_data(devices,logging)
+            prepare_data(client, devices, logging)
 
             #TODO: get topology and build interconnections
 
