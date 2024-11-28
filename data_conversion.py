@@ -49,6 +49,8 @@ def prepare_data(devices,logging):
             entities.append(Entity(device=device_entity))
             logging.info(f"Processed device: {device.hostname}")
 
+            #TODO: Create Location, Rack, and assign device to rack when diode supports
+
             logging.info(f"Processing interfaces and IPs for device: {device.hostname}")
 
             # Process interfaces for the device

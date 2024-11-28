@@ -105,6 +105,8 @@ def main():
             device_entities = prepare_data(devices,logging)
             logging.info(f"Created {len(device_entities)} diode entities.")
 
+            #TODO: get topology and build interconnections
+
             # Ingest data into Diode
             logging.info("Ingesting data into Diode...")
             response = client.ingest(entities=device_entities)# + interface_entities)
