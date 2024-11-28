@@ -71,7 +71,7 @@ def prepare_data(client,devices,logging):
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
-                    description=f"{device.hostnamename} mgmt0",
+                    description=f"{device.hostame} mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
