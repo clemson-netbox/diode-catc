@@ -128,7 +128,7 @@ class Transformer:
         """
         if not role:
             return None
-        return self.regex_replace(role.tite(), r"and Hubs", r"")
+        return self.regex_replace(role.title(), r"and Hubs", r"")
        
 
     def transform_platform(self, software_type, software_version):
