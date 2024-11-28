@@ -68,7 +68,7 @@ class Transformer:
     def get_network_addr(self, ip, prefix_or_mask):
         try:
             if "." in ip:  # IPv4
-                return ipaddress.IPv4Network(f"{ip}/{prefix_or_mask}").prefixlen
+                return ipaddress.IPv4Network(f"{ip}/{prefix_or_mask}", strict=False).prefixlen
             else:  # IPv6
                 prefix_length = int(prefix_or_mask)
                 network = ipaddress.IPv6Network(f"{ip}/{prefix_length}", strict=False)
