@@ -9,6 +9,14 @@ class Transformer:
         """
         self.site_rules = self._load_rules(site_rules_path)
         
+    def _load_rules(self, path):
+        try:
+            with open(path, "r") as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            logging.error(f"Failed to load rules from {path}: {e}")
+            exit(1)
+            
     def transform_name(self,hostname):
         """
         Transforms hostname to name without the domain and converts to lowercase.
