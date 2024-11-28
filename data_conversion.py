@@ -94,7 +94,7 @@ def prepare_data(client,devices,logging):
                 for interface in device.get("interfaces", []):
                     try:
                         interface_entity = Interface(
-                            name=interface.get("portNname"),
+                            name=interface.get("portName"),
                             mac_address=interface.get("macAddress"),
                             description=interface.get("description"),
                             type=transformer.infer_interface_type(
