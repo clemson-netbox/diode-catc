@@ -120,10 +120,9 @@ def prepare_data(client,devices,logging):
                                     tags=["Diode-CATC-Agent"],
                                 )
                                 if 'Vlan' in interface.get('portName'):
-                                    ip = str(transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')))
                                     prefix_entity = Prefix(
-                                        prefix=transformer.get_network_addr(ip),
-                                        site = transformer.site_to_site(transformer.extract_site(device.get("site"))),
+                                        prefix=transformer.get_network_addr(ip_data.address),
+                                        site = device_entity.site,
                                         description = interface.get('description'),
                                         status='active'
                                     )
