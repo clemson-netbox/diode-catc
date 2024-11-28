@@ -4,7 +4,7 @@ from transformer import Transformer
 
 def prepare_data(devices,logging):
     
-    transformer = transformer = Transformer("includes/site_rules.yml"),
+    transformer = Transformer("includes/site_rules.yml"),
     entities = []
 
     
