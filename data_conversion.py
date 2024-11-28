@@ -97,7 +97,7 @@ def prepare_data(devices,logging):
                             type=transformer.infer_interface_type(
                                 interface.get("portName"), interface.get("speed")
                             ),
-                            speed=interface.get("speed", 0),
+                            speed=int(interface.get("speed", 0)),
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
                             mtu=int(interface.get("mtu")),
                             tags=["Diode-CATC-Agent"],
