@@ -88,7 +88,7 @@ class Transformer:
         # Check if the portName indicates an ethernet interface
         if "E" in port_name:
             # Map speed to physical interface type
-            return speed_to_type_map.get(speed, "ethernet")
+            return speed_to_type_map.get(speed)
         elif 'channel' in port_name:
             return "lag"
         else:

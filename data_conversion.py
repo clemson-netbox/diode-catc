@@ -61,6 +61,7 @@ def prepare_data(devices,logging):
                         type="1000base-t",
                         speed=1000000, 
                         enabled=True,
+                        mgmt_only=True,
                         tags=["Diode-CATC-Agent"],
                     )
                 entities.append(Entity(interface=interface_entity))
@@ -98,7 +99,7 @@ def prepare_data(devices,logging):
                             ),
                             speed=int(interface.get("speed", 0)) * 1000,  # Convert Mbps to Kbps
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
-                            mtu=interface.get("mtu"),
+                            mtu=int(interface.get("mtu")),
                             tags=["Diode-CATC-Agent"],
                         )
                         entities.append(Entity(interface=interface_entity))
