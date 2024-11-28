@@ -96,7 +96,7 @@ def prepare_data(devices,logging):
                             type=transformer.infer_interface_type(
                                 interface.get("portName"), interface.get("speed")
                             ),
-                            speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
+                            speed=int(interface.get("speed", 0)) * 1000,  # Convert Mbps to Kbps
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
                             mtu=interface.get("mtu"),
                             tags=["Diode-CATC-Agent"],
@@ -105,7 +105,7 @@ def prepare_data(devices,logging):
                         logging.debug(f"Processed interface: {interface_entity.name}")
 
                         try:
-                            if (len(interface.get('ipv4Address'))>1):
+                            if interface.get('ipv4Address'):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
@@ -115,7 +115,7 @@ def prepare_data(devices,logging):
                                 entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                         except Exception as ip_error:
-                            logging.error(f"Error processing IP {ip}: {ip_error}")
+                            logging.error(f"Error processing IP {ip_data}: {ip_error}")
 
                     except Exception as interface_error:
                         logging.error(
