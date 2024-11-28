@@ -33,7 +33,7 @@ def get_device_data(client,logging):
 
         try:
             # Access Points Regex
-            ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4}*$"
+            ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4,4}.*$"
             
             # Routers/Switches Regex
             rs_regex = r"^(.*)-C*[0-9]{4,4}[a-zA-Z0-9]*-$"
@@ -55,14 +55,6 @@ def get_device_data(client,logging):
             # Log regex errors
             logging.error(f"Regex error processing hostname {hostname}: {e}")
             return hostname
-
-    
-    
-     #a-iptay-2-211j-ap9136i
- 
-        
-        #AE-Newberry-C930024ps-18.clemson.edu
-        rs_regex = r"^(.+)-C*\d{4,4}.+$"
 
     
     response = client.devices.get_device_count()
