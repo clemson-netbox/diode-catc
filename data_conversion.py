@@ -60,7 +60,7 @@ def prepare_data(client,devices,logging):
                         name='mgmt0',
                         mac_address=device.get("macAddress"),
                         device=device_entity, 
-                        description="AP Mgmt Interface",
+                        description=f"{device_entity.name} Management Interface",
                         type="1000base-t",
                         speed=1000000, 
                         enabled=True,
@@ -71,7 +71,7 @@ def prepare_data(client,devices,logging):
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
-                    description=f"{device.hostame} mgmt0",
+                    description=f"{device_entity.name} mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
@@ -81,7 +81,7 @@ def prepare_data(client,devices,logging):
                         name='radio0',
                         device=device_entity, 
                         mac_address=device.get("apEthernetMacAddress"),
-                        description="AP Radio",
+                        description=f"{device_entity.name} Radio Interface",
                         type='other-wireless',
                         enabled=True,
                         tags=["Diode-CATC-Agent"],
@@ -116,7 +116,7 @@ def prepare_data(client,devices,logging):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
-                                    description=f"{device.hostname} {interface.get('portName')} {interface.get('description')}",
+                                    description=f"{device_entity.name} {interface.get('portName')} {interface.get('description')}",
                                     tags=["Diode-CATC-Agent"],
                                 )
                                 if 'Vlan' in interface.get('portName'):
