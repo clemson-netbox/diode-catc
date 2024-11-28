@@ -4,7 +4,7 @@ from transformer import Transformer
 
 def prepare_data(devices,logging):
     
-    transformer = Transformer("includes/site_rules.yml")
+    transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
     entities = []
     
     #{'instanceUuid': '3dbe852a-1354-4d54-a77b-3219e995364b', 'instanceTenantId': '5f203c960f1a1c00c6926d61', 'deployPending': 'NONE', 'instanceVersion': 2, 
@@ -27,10 +27,12 @@ def prepare_data(devices,logging):
             #     location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
             # if device.get("snmpLocation"):
             #     location = device["snmpLocation"]
-
-            site = transformer.site_to_site(transformer.extract_site(device.get("site")))
             
+            if transformer.should_skip_device(transformer.transform_name(device.get("hostname"))):
+                continue
+                
             #TODO: Handle stackwise when multi serial#s
+
             device_entity = Device(
                 name=transformer.transform_name(device.get("hostname")),
                 device_type=transformer.transform_device_type(device.get("platformId")),
@@ -40,7 +42,7 @@ def prepare_data(devices,logging):
                     device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
-                site=site,
+                site=transformer.site_to_site(transformer.extract_site(device.get("site"))),
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),

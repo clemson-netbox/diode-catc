@@ -3,12 +3,13 @@ import yaml
 import logging
 
 class Transformer:
-    def __init__(self, site_rules_path):
+    def __init__(self, site_rules_path, skip_rules_pat):
         """
         Initialize the Transformer with paths to regex rules for site and tenant mappings.
         """
         self.site_rules = self._load_rules(site_rules_path)
-        
+        self.skip_device_rules = self._load_rules(skip_rules_path)
+
     def _load_rules(self, path):
         try:
             with open(path, "r") as f:
@@ -16,7 +17,14 @@ class Transformer:
         except Exception as e:
             logging.error(f"Failed to load rules from {path}: {e}")
             exit(1)
-            
+    
+    def should_skip_device(self, name):
+        for pattern in self.skip_device_rules:
+            if re.match(pattern, name, flags=re.IGNORECASE):
+                logging.info(f"Skipping Device: {name} (matched pattern: {pattern})")
+                return True
+        return False       
+    
     def transform_name(self,hostname):
         if not hostname:
             return None
