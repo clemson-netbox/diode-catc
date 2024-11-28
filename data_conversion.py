@@ -27,9 +27,7 @@ def prepare_data(devices,logging):
             #     location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
             # if device.get("snmpLocation"):
             #     location = device["snmpLocation"]
-            
-            if transformer.should_skip_device(transformer.transform_name(device.get("hostname"))):
-                continue
+        
                 
             #TODO: Handle stackwise when multi serial#s
 

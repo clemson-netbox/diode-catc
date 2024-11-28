@@ -1,10 +1,12 @@
 import re
 import os
 import json
+from transformer import Transformer
 
 def get_device_data(client,logging):
 
     SITE_CACHE_FILE = "./site_cache.json"
+    transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
 
     def _load_site_cache():
         if os.path.exists(SITE_CACHE_FILE):
@@ -27,27 +29,24 @@ def get_device_data(client,logging):
         except Exception as e:
             logging.error(f"Failed to save site cache: {e}")
 
-    def _extract_site_name(hostname):
-        """
-        Extracts the site prefix from a hostname based on the patterns for Access Points and Routers/Switches.
-        """
-        #a-iptay-2-211j-ap9136i
-        ap_regex = r"^([a-z].+)-[^-]+-ap[0-9a-z]{4,5}.*$"
+    def _extract_site_prefix(hostname):
+
+        try:
+            ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}$"
+            rs_regex = r"^(.*)-C?[0-9]+[a-zA-Z0-9-]*$"
+            ap_match = re.match(ap_regex, hostname)
+            if ap_match:
+                return ap_match.group(1)
+            rs_match = re.match(rs_regex, hostname)
+            if rs_match:
+                return rs_match.group(1)
+            # If no match, return None or hostname as fallback
+            return hostname
+        except re.error as e:
+            # Log regex errors
+            logging.error(f"Regex error processing hostname {hostname}: {e}")
+            return hostname
         
-        #AE-Newberry-C930024ps-18.clemson.edu
-        rs_regex = r"^(.+)-C*\d{4,4}.+$"
-
-        # Check Access Points
-        ap_match = re.match(ap_regex, hostname)
-        if ap_match:
-            return ap_match.group(1)
-
-        # Check Routers/Switches
-        rs_match = re.match(rs_regex, hostname)
-        if rs_match:
-            return rs_match.group(1)
-
-        return hostname
     
     response = client.devices.get_device_count()
     device_count = response['response']
@@ -87,11 +86,13 @@ def get_device_data(client,logging):
     for device in device_list:
         interfaces = []   
         items += 1          
-        
+
         try:
             hostname = device.get('hostname')
+            if transformer.should_skip_device(hostname):
+                continue
             logging.debug(f"Retrieving site name for device #{items}/{str(device_count)}: {hostname}")
-            site_prefix = _extract_site_name(hostname)
+            site_prefix = _extract_site_prefix(hostname)
             if site_prefix in site_cache:
                 device.site = site_cache[site_prefix]
                 logging.debug (f"Using cache {site_prefix}: {device.site}")
