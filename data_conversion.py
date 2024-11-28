@@ -105,14 +105,15 @@ def prepare_data(devices,logging):
                         logging.debug(f"Processed interface: {interface_entity.name}")
 
                         try:
-                            ip_data = IPAddress(
-                                address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
-                                interface=interface_entity,
-                                description=f"{device.name} {interface.get('portName')} {interface.get('description')}",
-                                tags=["Diode-CATC-Agent"],
-                            )
-                            entities.append(Entity(ip_address=ip_data))
-                            logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
+                            if (len(interface.get('ipv4Address'))>1):
+                                ip_data = IPAddress(
+                                    address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
+                                    interface=interface_entity,
+                                    description=f"{device.name} {interface.get('portName')} {interface.get('description')}",
+                                    tags=["Diode-CATC-Agent"],
+                                )
+                                entities.append(Entity(ip_address=ip_data))
+                                logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                         except Exception as ip_error:
                             logging.error(f"Error processing IP {ip}: {ip_error}")
 
