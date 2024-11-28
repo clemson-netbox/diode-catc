@@ -102,7 +102,7 @@ def main():
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
-            device_entities, interface_entities = prepare_data(devices,logging)
+            device_entities, interface_entities, ip_entities = prepare_data(devices,logging)
 
             #TODO: get topology and build interconnections
 
@@ -114,10 +114,17 @@ def main():
             else:
                 logging.info("Data ingested successfully into Diode.")
             
-            
             # Ingest data into Diode
             logging.info("Ingesting interface data into Diode...")
             response = client.ingest(entities=interface_entities)# + interface_entities)
+            if response.errors:
+                logging.error(f"Errors during ingestion: {response.errors}")
+            else:
+                logging.info("Data ingested successfully into Diode.")
+                
+             # Ingest data into Diode
+            logging.info("Ingesting ip data into Diode...")
+            response = client.ingest(entities=ip_entities)# + interface_entities)
             if response.errors:
                 logging.error(f"Errors during ingestion: {response.errors}")
             else:

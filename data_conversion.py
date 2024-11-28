@@ -7,6 +7,7 @@ def prepare_data(devices,logging):
     transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
     entities = []
     interface_entities = []
+    ip_entities = []
     
     #{'instanceUuid': '3dbe852a-1354-4d54-a77b-3219e995364b', 'instanceTenantId': '5f203c960f1a1c00c6926d61', 'deployPending': 'NONE', 'instanceVersion': 2, 
     # 'apEthernetMacAddress': '38:90:a5:f9:3d:cc', 'apManagerInterfaceIp': '172.19.3.84', 'associatedWlcIp': '172.19.3.84', 'collectionInterval': 'NA', 
@@ -118,7 +119,7 @@ def prepare_data(devices,logging):
                                     description=f"{device.hostname} {interface.get('portName')} {interface.get('description')}",
                                     tags=["Diode-CATC-Agent"],
                                 )
-                                interface_entities.append(Entity(ip_address=ip_data))
+                                ip_entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                                 
                                 #TODO: Create Prefix if VLAN interface
@@ -136,4 +137,4 @@ def prepare_data(devices,logging):
                 f"Error processing device {device.get('hostname', 'unknown')}: {device_error}"
             )
 
-    return entities,interface_entities
+    return entities,interface_entities,ip_entities
