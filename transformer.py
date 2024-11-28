@@ -167,22 +167,22 @@ class Transformer:
             match = re.match(r"^(?:[^/]+/){2}([^/]+)", site_hierarchy)
             if match:
                 return match.group(1).title()  
-            return "Unknown"  
+            return site_hierarchy 
         except re.error as e:
             # Handle regex errors gracefully
             logging.error(f"Regex error processing site from {site_hierarchy}: {e}")
-            return "Unknown"
+            return  site_hierarchy
 
     def extract_location(self,site_hierarchy):
         try:
             match = re.match(r"^(?:[^/]+/){3}([^/]+)", site_hierarchy)
             if match:
                 return match.group(1).title()  
-            return "Unknown"  
+            return  site_hierarchy  
         except re.error as e:
             # Handle regex errors gracefully
             logging.error(f"Regex error processing location from {site_hierarchy}: {e}")
-            return "Unknown"
+            return  site_hierarchy
 
 
     def transform_status(self,reachability_status):
