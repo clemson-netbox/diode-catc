@@ -33,7 +33,7 @@ class Transformer:
             if re.match(pattern, value, flags=re.IGNORECASE):
                 return re.sub(pattern, replacement, value, flags=re.IGNORECASE)
 
-        return value
+        return "Unknown"
 
     # Utility function for regex replacement
     def regex_replace(self, value, pattern, replacement):
