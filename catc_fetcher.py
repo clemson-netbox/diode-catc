@@ -33,11 +33,10 @@ def get_device_data(client,logging):
 
         try:
             # Access Points Regex
-            ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}.*$"
-            #ap_regex = r"^([a-z].+)-[^-]+-ap[0-9a-z]{4,5}.*$"
+            ap_regex = r"^([a-z].+)-[^-]+-ap[0-9a-z]{4,5}.*$"
             
             # Routers/Switches Regex
-            rs_regex = r"^(.*)-C?[0-9]+[a-zA-Z0-9-]*$"
+            rs_regex = r"^(.*)-C*[0-9]{4,4}[a-zA-Z0-9]*-$"
             #rs_regex = r"^(.+)-C*\d{4,4}.+$"
 
             # Check Access Points
