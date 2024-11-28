@@ -159,4 +159,3 @@ def prepare_data(client,devices,logging):
             )
 
     return entities
-tags
