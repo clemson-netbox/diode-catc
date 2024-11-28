@@ -79,7 +79,7 @@ def prepare_data(devices,logging):
                         device=device, 
                         mac_address=device.get("apEthernetMacAddress"),
                         description="AP Radio",
-                        type='wireless',
+                        type='other-wireless',
                         enabled=True,
                         tags=["Diode-CATC-Agent"],
                     )
@@ -97,13 +97,13 @@ def prepare_data(devices,logging):
                             type=transformer.infer_interface_type(
                                 interface.get("portName"), interface.get("speed")
                             ),
-                            speed=int(interface.get("speed", 0)) * 1000,  # Convert Mbps to Kbps
+                            speed=interface.get("speed", 0),
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
                             mtu=int(interface.get("mtu")),
                             tags=["Diode-CATC-Agent"],
                         )
                         entities.append(Entity(interface=interface_entity))
-                        logging.debug(f"Processed interface: {interface_entity.name}")
+                        logging.debug(f"Processed interface: {interface.get('portName')}")
 
                         try:
                             if interface.get('ipv4Address'):
