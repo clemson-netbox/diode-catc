@@ -4,11 +4,9 @@ from transformer import Transformer
 
 def prepare_data(devices,logging):
     
-    transformer = Transformer("includes/site_rules.yml"),
+    transformer = Transformer("includes/site_rules.yml")
     entities = []
-
     
-
     #{'instanceUuid': '3dbe852a-1354-4d54-a77b-3219e995364b', 'instanceTenantId': '5f203c960f1a1c00c6926d61', 'deployPending': 'NONE', 'instanceVersion': 2, 
     # 'apEthernetMacAddress': '38:90:a5:f9:3d:cc', 'apManagerInterfaceIp': '172.19.3.84', 'associatedWlcIp': '172.19.3.84', 'collectionInterval': 'NA', 
     # 'collectionStatus': 'Managed', 'collectionTier': '', 'deviceSupportLevel': 'Supported', 'dnsResolvedManagementAddress': '', 'errorCode': 'null', 
@@ -21,19 +19,16 @@ def prepare_data(devices,logging):
     # 'softwareVersion': '8.5.182.105', 'syncRequestedByApp': '', 'tagCount': '0', 'tunnelUdpPort': '16666', 'type': 'Cisco 2700E Unified Access Point', 
     # 'upTime': '56 days, 13:35:07.570', 'uptimeSeconds': 4927533, 'vendor': 'NA'}  
 
-
-    for device_data in devices:
+    for device in devices:
+        
         try:
-            
-            device=device_data
-            
             # location = transformer.extract_location(device_data.get("site"))
             # if len(location) < 1:
             #     location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
             # if device.get("snmpLocation"):
             #     location = device["snmpLocation"]
 
-            site = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
+            site = transformer.site_to_site(transformer.extract_site(device.get("site")))
             
             #TODO: Handle stackwise when multi serial#s
             device_entity = Device(
