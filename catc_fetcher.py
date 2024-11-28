@@ -35,13 +35,17 @@ def get_device_data(client,logging):
             #r-eric-1-100-ap9138i-10
             #c-sumper-ap9128-i44
             ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4,4}.*$"
-            
+            ap2_regex = r"^([a-z]-[\-]+)-[ap]*[0-9]{4,4}.*$"
             # Routers/Switches Regex
             rs_regex = r"^(.+)-[CIEXciex]{0,3}\d{4,4}.+$"
 
             ap_match = re.match(ap_regex, hostname)
             if ap_match:
                 return ap_match.group(1)
+            else:
+                ap2_match = re.match(ap2_regex, hostname)
+                if ap2_match:
+                    return ap2_match.group(1)
             rs_match = re.match(rs_regex, hostname)
             if rs_match:
                 return rs_match.group(1)
