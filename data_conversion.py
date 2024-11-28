@@ -67,7 +67,7 @@ def prepare_data(devices,logging):
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
-                    description=f"{device_data.name} mgmt0",
+                    description=f"{device.name} mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
@@ -87,16 +87,14 @@ def prepare_data(devices,logging):
             
             else:
                     
-                for interface_data in device.get("interfaces", []):
-                    interface = interface_data
-                    logging.info(f"interface: {interface}")
+                for interface in device.get("interfaces", []):
                     try:
                         interface_entity = Interface(
-                            name=interface.get("name"),
+                            name=interface.get("portNname"),
                             ma_address=interface.get("macAddress"),
                             description=interface.get("description"),
                             type=transformer.infer_interface_type(
-                                interface.get("name"), interface.get("speed")
+                                interface.get("portName"), interface.get("speed")
                             ),
                             speed=interface.get("speed", 0) * 1000,  # Convert Mbps to Kbps
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
@@ -112,7 +110,7 @@ def prepare_data(devices,logging):
                                 ip_data = IPAddress(
                                     address=ip,
                                     interface=interface_entity,
-                                    description=f"{device_data.name} {interface.get('name')} {interface.get('description')}",
+                                    description=f"{device.name} {interface.get('portName')} {interface.get('description')}",
                                     tags=["Diode-CATC-Agent"],
                                 )
                                 entities.append(Entity(ip_address=ip_data))
@@ -122,7 +120,7 @@ def prepare_data(devices,logging):
 
                     except Exception as interface_error:
                         logging.error(
-                            f"Error processing interface {interface.get('name', 'unknown')}: {interface_error}"
+                            f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                         )
 
         except Exception as device_error:

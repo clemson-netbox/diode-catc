@@ -18,9 +18,6 @@ class Transformer:
             exit(1)
             
     def transform_name(self,hostname):
-        """
-        Transforms hostname to name without the domain and converts to lowercase.
-        """
         if not hostname:
             return None
         return hostname.lower().split(".clemson.edu")[0]
@@ -74,7 +71,7 @@ class Transformer:
             return "full" if duplex else "half"
         return "auto"  # Default to auto if duplex is missing or unrecognized
 
-    def infer_interface_type(self,port_name, speed):
+    def infer_interface_type(self, port_name, speed):
         """
         Infer interface type based on portName and speed.
         """
