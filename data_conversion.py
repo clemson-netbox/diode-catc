@@ -47,7 +47,7 @@ def prepare_data(client,devices,logging):
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
-                tags=["Diode-CATC-Agent"],
+                tags=["Diode-CATC-Agent","Diode"],
             )
             entities.append(Entity(device=device_entity))
             logging.info(f"Processed device: {device.hostname}")
@@ -67,14 +67,14 @@ def prepare_data(client,devices,logging):
                         speed=1000000, 
                         enabled=True,
                         mgmt_only=True,
-                        tags=["Diode-CATC-Agent"],
+                        tags=["Diode-CATC-Agent","Diode"],
                     )
                 entities.append(Entity(interface=interface_entity))
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
                     description=f"{device_name}: mgmt0",
-                    tags=["Diode-CATC-Agent"],
+                    tags=["Diode-CATC-Agent","Diode"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
                 logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
@@ -86,7 +86,7 @@ def prepare_data(client,devices,logging):
                         description=f"{device_name} Radio Interface",
                         type='other-wireless',
                         enabled=True,
-                        tags=["Diode-CATC-Agent"],
+                        tags=["Diode-CATC-Agent","Diode"],
                     )
                 entities.append(Entity(interface=interface_entity))
                 logging.debug(f"Processed AP interface: radio0")
@@ -105,7 +105,7 @@ def prepare_data(client,devices,logging):
                             speed=int(interface.get("speed", 0)),
                             enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
                             mtu=int(interface.get("mtu")),
-                            tags=["Diode-CATC-Agent"],
+                            tags=["Diode-CATC-Agent","Diode"],
                         )
                         entities.append(Entity(interface=interface_entity))
                         #TODO: assign LAG members if port-channel
@@ -119,14 +119,16 @@ def prepare_data(client,devices,logging):
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
                                     description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
-                                    tags=["Diode-CATC-Agent"],
+                                    tags=["Diode-CATC-Agent","Diode"],
                                 )
                                 if 'Vlan' in interface.get('portName'):
                                     prefix_entity = Prefix(
                                         prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                         site = device_entity.site,
                                         description = f"{interface_entity.name}: {site_name} {interface_entity.description}",
-                                        status='active'
+                                        status='active',
+                                        tags=["Diode-CATC-Agent","Diode"],
+
                                     )
                                     entities.append(Entity(prefix=prefix_entity))
 
@@ -157,3 +159,4 @@ def prepare_data(client,devices,logging):
             )
 
     return entities
+tags
