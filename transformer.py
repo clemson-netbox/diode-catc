@@ -89,7 +89,7 @@ class Transformer:
         if "E" in port_name:
             # Map speed to physical interface type
             return speed_to_type_map.get(speed, "ethernet")
-        elif 'Channel' in port_name:
+        elif 'channel' in port_name:
             return "lag"
         else:
             return "virtual"
