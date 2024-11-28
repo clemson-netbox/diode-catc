@@ -65,7 +65,7 @@ class Transformer:
             logging.error(f"CIDR error {ip} {subnet_mask}: {e}")
             return None
 
-    def get_network_addr(ip, prefix_or_mask):
+    def get_network_addr(self, ip, prefix_or_mask):
         try:
             if "." in ip:  # IPv4
                 if "." in prefix_or_mask:  # If it's a subnet mask
