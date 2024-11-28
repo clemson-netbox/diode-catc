@@ -1,6 +1,7 @@
 import re
 import yaml
 import logging
+from ipaddress import ip_network
 
 class Transformer:
     def __init__(self, site_rules_path, skip_rules_path):
@@ -31,35 +32,37 @@ class Transformer:
         return hostname.lower().split(".clemson.edu")[0]
 
     def apply_regex_replacements(self, value, rules):
-        for rule in rules:
-            # Validate rule structure
-            if len(rule) != 2:
-                logging.error(f"Malformed rule: {rule}")
-                continue
+        try:
+            for rule in rules:
+                # Validate rule structure
+                if len(rule) != 2:
+                    logging.error(f"Malformed rule: {rule}")
+                    continue
 
-            pattern, replacement = rule
-            if re.match(pattern, value, flags=re.IGNORECASE):
-                return re.sub(pattern, replacement, value, flags=re.IGNORECASE)
+                pattern, replacement = rule
+                if re.match(pattern, value, flags=re.IGNORECASE):
+                    return re.sub(pattern, replacement, value, flags=re.IGNORECASE)
+        except re.error as e:
+            # Handle regex errors gracefully
+            logging.error(f"Regex error {value} {rule}: {e}")
+            return "Unknown"
 
         return "Unknown"
 
-    # Utility function for regex replacement
     def regex_replace(self, value, pattern, replacement):
-        """
-        Applies a regex pattern replacement to a given string value.
-        """
-        import re
-        return re.sub(pattern, replacement, value)
+        try:
+            return re.sub(pattern, replacement, value)
+        except re.error as e:
+            # Handle regex errors gracefully
+            logging.error(f"Regex error {value} {pattern}: {e}")
+            return "Unknown"
 
     def get_cidr(self,ip, subnet_mask):
-        """
-        Convert IP and subnet mask into CIDR notation.
-        """
-        from ipaddress import ip_network
         try:
             network = ip_network(f"{ip}/{subnet_mask}", strict=False)
             return str(network)
         except ValueError:
+            logging.error(f"CIDR error {ip} {mask}: {e}")
             return None
 
     def site_to_site(self, name):
@@ -92,15 +95,18 @@ class Transformer:
             40000: "40gbase-x-qsfpp",
             100000: "100gbase-x-qsfp28",
         }
-
-        # Check if the portName indicates an ethernet interface
-        if "E" in port_name:
-            # Map speed to physical interface type
-            return speed_to_type_map.get(speed)
-        elif "channel" in port_name:
-            return "lag"
-        else:
-            return "virtual"
+        try:
+            # Check if the portName indicates an ethernet interface
+            if "E" in port_name:
+                # Map speed to physical interface type
+                return speed_to_type_map.get(speed)
+            elif "channel" in port_name:
+                return "lag"
+            else:
+                return "virtual"
+        except Exception as e:
+            logging.error(f"Infer interface type error {port_name} {speed}: {e}")
+            return None
 
     def transform_device_type(self, platform_id):
         """
@@ -129,7 +135,7 @@ class Transformer:
         """
         if not role:
             return None
-        return self.regex_replace(role.title(), r"and Hubs", r"")
+        return role.title()
        
 
     def transform_platform(self, software_type, software_version):
@@ -148,7 +154,7 @@ class Transformer:
             return "Unknown"  
         except re.error as e:
             # Handle regex errors gracefully
-            logging.error(f"Regex error processing site hierarchy {site_hierarchy}: {e}")
+            logging.error(f"Regex error processing site from {site_hierarchy}: {e}")
             return "Unknown"
 
     def extract_location(self,site_hierarchy):
@@ -159,7 +165,7 @@ class Transformer:
             return "Unknown"  
         except re.error as e:
             # Handle regex errors gracefully
-            logging.error(f"Regex error processing site hierarchy {site_hierarchy}: {e}")
+            logging.error(f"Regex error processing location from {site_hierarchy}: {e}")
             return "Unknown"
 
 

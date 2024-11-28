@@ -30,29 +30,21 @@ def get_device_data(client,logging):
             logging.error(f"Failed to save site cache: {e}")
 
     def _extract_site_prefix(hostname):
-
         try:
             # Access Points Regex
             ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4,4}.*$"
-            
             # Routers/Switches Regex
             rs_regex = r"^(.*)-[Cc]*[0-9]{4,4}-.+$"
             #rs_regex = r"^(.+)-C*\d{4,4}.+$"
 
-            # Check Access Points
             ap_match = re.match(ap_regex, hostname)
             if ap_match:
                 return ap_match.group(1)
-
-            # Check Routers/Switches
             rs_match = re.match(rs_regex, hostname)
             if rs_match:
                 return rs_match.group(1)
-
-            # If no match, return None or hostname as fallback
             return hostname
         except re.error as e:
-            # Log regex errors
             logging.error(f"Regex error processing hostname {hostname}: {e}")
             return hostname
 
