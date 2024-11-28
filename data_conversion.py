@@ -123,7 +123,7 @@ def prepare_data(client,devices,logging):
                                     prefix_entity = Prefix(
                                         prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                         site = device_entity.site,
-                                        description = interface.get('description'),
+                                        description = f"{interface_entity.ame}: {device_entity.site} {interface_entity.description}",
                                         status='active'
                                     )
                                     entities.append(Entity(prefix=prefix_entity))
