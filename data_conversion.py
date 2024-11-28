@@ -75,7 +75,7 @@ def prepare_data(devices,logging):
                     description=f"{device.hostnamename} mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
-                interface_entities.append(Entity(ip_address=ip_entity))
+                ip_entities.append(Entity(ip_address=ip_entity))
                 logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
                 interface_entity = Interface(
