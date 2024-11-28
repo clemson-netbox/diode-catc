@@ -27,11 +27,11 @@ def prepare_data(devices,logging):
             
             device=device_data
             
-            location = transformer.extract_location(device_data.get("site"))
-            if len(location) < 1:
-                location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
-            if device.get("snmpLocation"):
-                location = device["snmpLocation"]
+            # location = transformer.extract_location(device_data.get("site"))
+            # if len(location) < 1:
+            #     location = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
+            # if device.get("snmpLocation"):
+            #     location = device["snmpLocation"]
 
             site = transformer.site_to_site(transformer.extract_site(device_data.get("site")))
             
