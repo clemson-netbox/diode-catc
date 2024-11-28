@@ -109,6 +109,7 @@ def get_device_data(client,logging):
             hostname = device.get('hostname')
             if transformer.should_skip_device(hostname):
                 continue
+            
             logging.debug(f"Retrieving site name for device #{items}/{str(device_count)}: {hostname}")
             site_prefix = _extract_site_prefix(hostname)
             if site_prefix in site_cache:
