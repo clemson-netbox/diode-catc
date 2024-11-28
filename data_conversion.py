@@ -2,12 +2,11 @@ from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Entity
 from transformer import Transformer
 
 
-def prepare_data(devices,logging):
+def prepare_data(client,devices,logging):
     
     transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
     entities = []
-    interface_entities = []
-    ip_entities = []
+
     
     #{'instanceUuid': '3dbe852a-1354-4d54-a77b-3219e995364b', 'instanceTenantId': '5f203c960f1a1c00c6926d61', 'deployPending': 'NONE', 'instanceVersion': 2, 
     # 'apEthernetMacAddress': '38:90:a5:f9:3d:cc', 'apManagerInterfaceIp': '172.19.3.84', 'associatedWlcIp': '172.19.3.84', 'collectionInterval': 'NA', 
@@ -68,14 +67,14 @@ def prepare_data(devices,logging):
                         mgmt_only=True,
                         tags=["Diode-CATC-Agent"],
                     )
-                interface_entities.append(Entity(interface=interface_entity))
+                entities.append(Entity(interface=interface_entity))
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
                     description=f"{device.hostnamename} mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
-                ip_entities.append(Entity(ip_address=ip_entity))
+                entities.append(Entity(ip_address=ip_entity))
                 logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
                 interface_entity = Interface(
@@ -87,7 +86,7 @@ def prepare_data(devices,logging):
                         enabled=True,
                         tags=["Diode-CATC-Agent"],
                     )
-                interface_entities.append(Entity(interface=interface_entity))
+                entities.append(Entity(interface=interface_entity))
                 logging.debug(f"Processed AP interface: radio0")
             
             else:
@@ -106,7 +105,7 @@ def prepare_data(devices,logging):
                             mtu=int(interface.get("mtu")),
                             tags=["Diode-CATC-Agent"],
                         )
-                        interface_entities.append(Entity(interface=interface_entity))
+                        entities.append(Entity(interface=interface_entity))
                         #TODO: assign LAG members if port-channel
                         
                         logging.debug(f"Processed interface: {interface.get('portName')}")
@@ -119,7 +118,7 @@ def prepare_data(devices,logging):
                                     description=f"{device.hostname} {interface.get('portName')} {interface.get('description')}",
                                     tags=["Diode-CATC-Agent"],
                                 )
-                                ip_entities.append(Entity(ip_address=ip_data))
+                                entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                                 
                                 #TODO: Create Prefix if VLAN interface
@@ -131,10 +130,18 @@ def prepare_data(devices,logging):
                         logging.error(
                             f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                         )
-
+            # Ingest data into Diode
+            logging.info(f"Ingesting device {device.hostname} data into Diode...")
+            response = client.ingest(entities=entities)# + interface_entities)
+            if response.errors:
+                logging.error(f"Errors during ingestion: {response.errors}")
+            else:
+                logging.info("Data ingested successfully into Diode.")
+            entities = []
+                
         except Exception as device_error:
             logging.error(
                 f"Error processing device {device.get('hostname', 'unknown')}: {device_error}"
             )
 
-    return entities,interface_entities,ip_entities
+    return entities
