@@ -3,7 +3,7 @@ import yaml
 import logging
 
 class Transformer:
-    def __init__(self, site_rules_path, skip_rules_pat):
+    def __init__(self, site_rules_path, skip_rules_path):
         """
         Initialize the Transformer with paths to regex rules for site and tenant mappings.
         """
