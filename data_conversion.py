@@ -121,7 +121,7 @@ def prepare_data(client,devices,logging):
                                 )
                                 if 'Vlan' in interface.get('portName'):
                                     prefix_entity = Prefix(
-                                        prefix=transformer.get_network_addr(ip_data.address),
+                                        prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                         site = device_entity.site,
                                         description = interface.get('description'),
                                         status='active'
