@@ -118,7 +118,7 @@ def prepare_data(client,devices,logging):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
-                                    description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
+                                    description=f"{interface_entity.get('description')}",
                                     tags=["Diode-CATC-Agent","Diode"],
                                 )
                                 if 'Vlan' in interface.get('portName'):
