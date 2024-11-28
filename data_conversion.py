@@ -32,7 +32,7 @@ def prepare_data(client,devices,logging):
                 
             #TODO: Handle stackwise when multi serial#s
             site_name = transformer.site_to_site(transformer.extract_site(device.get("site")))
-            device_name=transformer.transform_name(device.get("hostname")),
+            device_name=transformer.transform_name(device.get("hostname"))
 
             device_entity = Device(
                 name=device_name,
