@@ -32,8 +32,8 @@ def get_device_data(client,logging):
     def _extract_site_prefix(hostname):
         try:
             # Access Points Regex
-            #ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4,4}.*$"
-            ap_regex = r"((?:[^-]+-){1,2}[^-]+)-[ap]*[0-9a-zA-Z]{4,4}.*$"
+            ap_regex = r"^([a-z].+)-[^-]+-[ap]*[0-9]{4,4}.*$"
+            #ap_regex = r"((?:[^-]+-){1,2}[^-]+)-[ap]*[0-9a-zA-Z]{4,4}.*$"
 
             # Routers/Switches Regex
             rs_regex = r"^(.+)-[CIEX]{0,3}\d{4,4}.+$"
