@@ -89,7 +89,7 @@ class Transformer:
         if "E" in port_name:
             # Map speed to physical interface type
             return speed_to_type_map.get(speed)
-        elif 'channel' in port_name:
+        elif "channel" in port_name:
             return "lag"
         else:
             return "virtual"
@@ -133,23 +133,26 @@ class Transformer:
 
 
     def extract_site(self,site_hierarchy):
-        """
-        Extracts the site name from the siteNameHierarchy.
-        """
-        if not site_hierarchy:
-            return None
-        site = self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/([^/]+)/*.*$", r"\1").title()
-        return site
-
+        try:
+            match = re.match(r"^(?:[^/]+/){2}([^/]+)", site_hierarchy)
+            if match:
+                return match.group(1).title()  
+            return "Unknown"  
+        except re.error as e:
+            # Handle regex errors gracefully
+            logging.error(f"Regex error processing site hierarchy {site_hierarchy}: {e}")
+            return "Unknown"
 
     def extract_location(self,site_hierarchy):
-        """
-        Extracts the location from the siteNameHierarchy.
-        """
-        if not site_hierarchy:
-            return None
-        location = self.regex_replace(site_hierarchy, r"^[^/]+/[^/]+/[^/]+/([^/]+)/*.*$", r"\1").title()
-        return location
+        try:
+            match = re.match(r"^(?:[^/]+/){3}([^/]+)", site_hierarchy)
+            if match:
+                return match.group(1).title()  
+            return "Unknown"  
+        except re.error as e:
+            # Handle regex errors gracefully
+            logging.error(f"Regex error processing site hierarchy {site_hierarchy}: {e}")
+            return "Unknown"
 
 
     def transform_status(self,reachability_status):
