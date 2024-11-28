@@ -103,6 +103,8 @@ def prepare_data(devices,logging):
                             tags=["Diode-CATC-Agent"],
                         )
                         entities.append(Entity(interface=interface_entity))
+                        #TODO: assign LAG members if port-channel
+                        
                         logging.debug(f"Processed interface: {interface.get('portName')}")
 
                         try:
@@ -115,6 +117,9 @@ def prepare_data(devices,logging):
                                 )
                                 entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
+                                
+                                #TODO: Create Prefix if VLAN interface
+                                #TODO: Create VLAN when Diode Updated
                         except Exception as ip_error:
                             logging.error(f"Error processing IP {ip_data}: {ip_error}")
 
