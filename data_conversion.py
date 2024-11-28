@@ -58,7 +58,7 @@ def prepare_data(devices,logging):
                 interface_entity = Interface(
                         name='mgmt0',
                         mac_address=device.get("macAddress"),
-                        device=device, 
+                        device=device_entity, 
                         description="AP Mgmt Interface",
                         type="1000base-t",
                         speed=1000000, 
@@ -78,7 +78,7 @@ def prepare_data(devices,logging):
 
                 interface_entity = Interface(
                         name='radio0',
-                        device=device, 
+                        device=device_entity, 
                         mac_address=device.get("apEthernetMacAddress"),
                         description="AP Radio",
                         type='other-wireless',
