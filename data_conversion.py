@@ -31,9 +31,11 @@ def prepare_data(client,devices,logging):
         
                 
             #TODO: Handle stackwise when multi serial#s
+            site_name = transformer.site_to_site(transformer.extract_site(device.get("site")))
+            device_name=transformer.transform_name(device.get("hostname")),
 
             device_entity = Device(
-                name=transformer.transform_name(device.get("hostname")),
+                name=device_name,
                 device_type=transformer.transform_device_type(device.get("platformId")),
                 manufacturer="Cisco",
                 role=f"{device.get('family')} - {transformer.transform_role(device.get('role'))}",
@@ -41,7 +43,7 @@ def prepare_data(client,devices,logging):
                     device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                 ),
                 serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
-                site=transformer.site_to_site(transformer.extract_site(device.get("site"))),
+                site=site_name,
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
@@ -60,7 +62,7 @@ def prepare_data(client,devices,logging):
                         name='mgmt0',
                         mac_address=device.get("macAddress"),
                         device=device_entity, 
-                        description=f"{device_entity.name} Management Interface",
+                        description=f"{device_name}: Management Interface",
                         type="1000base-t",
                         speed=1000000, 
                         enabled=True,
@@ -71,7 +73,7 @@ def prepare_data(client,devices,logging):
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
-                    description=f"{device_entity.name} mgmt0",
+                    description=f"{device_name}: mgmt0",
                     tags=["Diode-CATC-Agent"],
                 )
                 entities.append(Entity(ip_address=ip_entity))
@@ -81,7 +83,7 @@ def prepare_data(client,devices,logging):
                         name='radio0',
                         device=device_entity, 
                         mac_address=device.get("apEthernetMacAddress"),
-                        description=f"{device_entity.name} Radio Interface",
+                        description=f"{device_name} Radio Interface",
                         type='other-wireless',
                         enabled=True,
                         tags=["Diode-CATC-Agent"],
@@ -96,7 +98,7 @@ def prepare_data(client,devices,logging):
                         interface_entity = Interface(
                             name=interface.get("portName"),
                             mac_address=interface.get("macAddress"),
-                            description=interface.get("description"),
+                            description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
                             type=transformer.infer_interface_type(
                                 interface.get("portName"), interface.get("speed")
                             ),
@@ -116,14 +118,14 @@ def prepare_data(client,devices,logging):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
-                                    description=f"{device_entity.name} {interface.get('portName')} {interface.get('description')}",
+                                    description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
                                     tags=["Diode-CATC-Agent"],
                                 )
                                 if 'Vlan' in interface.get('portName'):
                                     prefix_entity = Prefix(
                                         prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                         site = device_entity.site,
-                                        description = f"{interface_entity.name}: {device_entity.site} {interface_entity.description}",
+                                        description = f"{interface_entity.name}: {site_name} {interface_entity.description}",
                                         status='active'
                                     )
                                     entities.append(Entity(prefix=prefix_entity))
