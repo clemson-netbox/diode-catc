@@ -91,7 +91,7 @@ def prepare_data(devices,logging):
                     try:
                         interface_entity = Interface(
                             name=interface.get("portNname"),
-                            ma_address=interface.get("macAddress"),
+                            mac_address=interface.get("macAddress"),
                             description=interface.get("description"),
                             type=transformer.infer_interface_type(
                                 interface.get("portName"), interface.get("speed")
