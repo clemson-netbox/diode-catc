@@ -104,19 +104,17 @@ def prepare_data(devices,logging):
                         entities.append(Entity(interface=interface_entity))
                         logging.debug(f"Processed interface: {interface_entity.name}")
 
-                        # Process IPs for the interface
-                        for ip in interface.get("ips", []):
-                            try:
-                                ip_data = IPAddress(
-                                    address=ip,
-                                    interface=interface_entity,
-                                    description=f"{device.name} {interface.get('portName')} {interface.get('description')}",
-                                    tags=["Diode-CATC-Agent"],
-                                )
-                                entities.append(Entity(ip_address=ip_data))
-                                logging.debug(f"Processed {interface_entity.name} IP: {ip}")
-                            except Exception as ip_error:
-                                logging.error(f"Error processing IP {ip}: {ip_error}")
+                        try:
+                            ip_data = IPAddress(
+                                address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
+                                interface=interface_entity,
+                                description=f"{device.name} {interface.get('portName')} {interface.get('description')}",
+                                tags=["Diode-CATC-Agent"],
+                            )
+                            entities.append(Entity(ip_address=ip_data))
+                            logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
+                        except Exception as ip_error:
+                            logging.error(f"Error processing IP {ip}: {ip_error}")
 
                     except Exception as interface_error:
                         logging.error(

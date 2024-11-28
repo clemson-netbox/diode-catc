@@ -85,16 +85,12 @@ class Transformer:
             100000: "100gbase-x-qsfp28",
         }
 
-        # Check if the portName indicates a virtual interface
-        if "loopback" in port_name.lower():
-            return "loopback"
-        elif "vlan" in port_name.lower():
-            return "vlan"
-        elif "tunnel" in port_name.lower():
-            return "tunnel"
-        elif "ethernet" in port_name.lower() or "gigabit" in port_name.lower():
+        # Check if the portName indicates an ethernet interface
+        if "E" in port_name:
             # Map speed to physical interface type
             return speed_to_type_map.get(speed, "ethernet")
+        elif 'Channel' in port_name:
+            return "lag"
         else:
             return "virtual"
 
