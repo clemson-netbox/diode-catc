@@ -32,21 +32,39 @@ def get_device_data(client,logging):
     def _extract_site_prefix(hostname):
 
         try:
-            ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}$"
+            # Access Points Regex
+            ap_regex = r"^(.*)-([a-zA-Z0-9]+)-ap[a-zA-Z0-9]{4,5}.*$"
+            #ap_regex = r"^([a-z].+)-[^-]+-ap[0-9a-z]{4,5}.*$"
+            
+            # Routers/Switches Regex
             rs_regex = r"^(.*)-C?[0-9]+[a-zA-Z0-9-]*$"
+            #rs_regex = r"^(.+)-C*\d{4,4}.+$"
+
+            # Check Access Points
             ap_match = re.match(ap_regex, hostname)
             if ap_match:
                 return ap_match.group(1)
+
+            # Check Routers/Switches
             rs_match = re.match(rs_regex, hostname)
             if rs_match:
                 return rs_match.group(1)
+
             # If no match, return None or hostname as fallback
             return hostname
         except re.error as e:
             # Log regex errors
             logging.error(f"Regex error processing hostname {hostname}: {e}")
             return hostname
+
+    
+    
+     #a-iptay-2-211j-ap9136i
+ 
         
+        #AE-Newberry-C930024ps-18.clemson.edu
+        rs_regex = r"^(.+)-C*\d{4,4}.+$"
+
     
     response = client.devices.get_device_count()
     device_count = response['response']
