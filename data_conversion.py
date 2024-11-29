@@ -133,12 +133,10 @@ def prepare_data(client,devices,logging):
 
                                     )
                                     entities.append(Entity(prefix=prefix_entity))
-
-                                logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
                                     
                                #TODO: Create VLAN when Diode Updated
                         except Exception as ip_error:
-                            logging.error(f"Error processing IP {ip_data}: {ip_error}")
+                            logging.error(f"Error processing IP: {ip_error}")
 
                     except Exception as interface_error:
                         logging.error(
