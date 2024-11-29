@@ -121,6 +121,8 @@ def prepare_data(client,devices,logging):
                                     description=f"{interface_entity.get('description')}",
                                     tags=["Diode-CATC-Agent","Diode"],
                                 )
+                                entities.append(Entity(ip_address=ip_data))
+
                                 if 'Vlan' in interface.get('portName'):
                                     prefix_entity = Prefix(
                                         prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
@@ -132,11 +134,9 @@ def prepare_data(client,devices,logging):
                                     )
                                     entities.append(Entity(prefix=prefix_entity))
 
-                                entities.append(Entity(ip_address=ip_data))
                                 logging.debug(f"Processed {interface_entity.name} IP: {ip_data.address}")
-                                
-                                #TODO: Create Prefix if VLAN interface
-                                #TODO: Create VLAN when Diode Updated
+                                    
+                               #TODO: Create VLAN when Diode Updated
                         except Exception as ip_error:
                             logging.error(f"Error processing IP {ip_data}: {ip_error}")
 
