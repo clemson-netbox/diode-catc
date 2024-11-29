@@ -118,7 +118,7 @@ def prepare_data(client,devices,logging):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
-                                    description=f"{interface_entity.get('description')}",
+                                    description=f"{interface_entity.description}",
                                     tags=["Diode-CATC-Agent","Diode"],
                                 )
                                 entities.append(Entity(ip_address=ip_data))
