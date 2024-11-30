@@ -89,7 +89,9 @@ def get_device_data(client,logging,skip_interfaces=False):
     items=0
     site_cache = _load_site_cache()  # Load cache at startup
     
-    logging.info("Skipping Interface Collection")
+    if skip_interfaces:
+        logging.info("Skipping Interface Collection")
+        
     for device in device_list:
         interfaces = []   
         items += 1          
