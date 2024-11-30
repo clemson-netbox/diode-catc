@@ -45,9 +45,9 @@ class Transformer:
         except re.error as e:
             # Handle regex errors gracefully
             logging.error(f"Regex error {value} {rule}: {e}")
-            return "Unknown"
+            return value
 
-        return "Unknown"
+        return value
 
     def regex_replace(self, value, pattern, replacement):
         try:
@@ -80,7 +80,7 @@ class Transformer:
 
     def site_to_site(self, name):
         """
-        Transform a host's cluster name to its site name.
+        Apply site_rules        
         """
         return self.apply_regex_replacements(name, self.site_rules)
 
@@ -179,7 +179,7 @@ class Transformer:
         except re.error as e:
             # Handle regex errors gracefully
             logging.error(f"Regex error processing location from {site_hierarchy}: {e}")
-            return "Unknown"
+            return site_hierarchy
 
 
     def transform_status(self,reachability_status):
