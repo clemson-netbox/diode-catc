@@ -140,7 +140,7 @@ def prepare_data(client,devices,logging):
 
                     except Exception as interface_error:
                         logging.error(
-                            f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
+                            f"Error processing interface {device_name} {interface.get('portName', 'unknown')}: {interface_error}"
                         )
                         
             # Ingest data into Diode
