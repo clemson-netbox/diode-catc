@@ -164,4 +164,12 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                 f"Error processing device {device.get('hostname', 'unknown')}: {device_error}"
             )
 
+    logging.info(f"Ingesting {len(entities)} entity batch device data into Diode...")
+    response = client.ingest(entities=entities)# + interface_entities)
+    if response.errors:
+        logging.error(f"Errors during ingestion: {response.errors}")
+    else:
+        logging.debug("Data ingested successfully into Diode.")
+    entities = []
+
     return entities
