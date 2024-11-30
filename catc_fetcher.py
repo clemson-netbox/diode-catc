@@ -3,7 +3,7 @@ import os
 import json
 from transformer import Transformer
 
-def get_device_data(client,logging):
+def get_device_data(client,logging,skip_interfaces=False):
 
     SITE_CACHE_FILE = "./site_cache.json"
     transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
@@ -89,6 +89,7 @@ def get_device_data(client,logging):
     items=0
     site_cache = _load_site_cache()  # Load cache at startup
     
+    logging.info("Skipping Interface Collection")
     for device in device_list:
         interfaces = []   
         items += 1          
@@ -113,7 +114,7 @@ def get_device_data(client,logging):
                     _save_site_cache(site_cache) 
                 
             #AP have no interfaces in CATC    
-            if not 'Unified AP' in device.family:
+            if not 'Unified AP' in device.family and not skip_interfaces:
                 try:
                     logging.debug(f"Retrieving interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])        

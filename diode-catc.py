@@ -104,7 +104,7 @@ def main():
 
             # Fetch data from Catalyst Center
             logging.info("Retrieving device data from Catalyst Center...")
-            devices = get_device_data(catc,logging)
+            devices = get_device_data(catc,logging, args.skip_interfaces)
             logging.info(f"Retrieved {len(devices)} devices.")
 
             # Prepare data into Diode-compatible entities
