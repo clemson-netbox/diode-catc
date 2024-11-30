@@ -104,12 +104,12 @@ def main():
 
             # Fetch data from Catalyst Center
             logging.info("Retrieving device data from Catalyst Center...")
-            devices = get_device_data(catc,logging,args.skip_interfaces)
+            devices = get_device_data(catc,logging)
             logging.info(f"Retrieved {len(devices)} devices.")
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")
-            prepare_data(client, devices, logging)
+            prepare_data(client, devices, logging, args.skip_interfaces)
 
             #TODO: get topology and build interconnections
 
