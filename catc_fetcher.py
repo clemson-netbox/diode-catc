@@ -16,9 +16,9 @@ def get_device_data(client,logging):
                     logging.debug(f"Loaded site cache from {SITE_CACHE_FILE}")
                     return site_cache
                 except json.JSONDecodeError as e:
-                    logging.warning(f"Could not decode site cache file: {e}")
+                    logging.error(f"Could not decode site cache file: {e}")
       
-        logging.debug(f"No cache found at {SITE_CACHE_FILE}")                    
+        logging.error(f"No cache found at {SITE_CACHE_FILE}")                    
         return {}  # Return an empty cache if the file doesn't exist or is invalid
 
     def _save_site_cache(site_cache):
@@ -73,7 +73,7 @@ def get_device_data(client,logging):
 
     response = client.sites.get_site_count()
     site_count = response['response']    
-    logging.info(f'Retrieving {site_count} sites from Cisco Catalyst Center')
+    logging.debug(f'Retrieving {site_count} sites from Cisco Catalyst Center')
     offset = 1
     limit = 500
     site_list = []
@@ -84,7 +84,7 @@ def get_device_data(client,logging):
         site_list.extend(response['response'])
         items += limit
         logging.debug(f"Retrieved {items} sites")
-    logging.info('Collected complete site list from Cisco Catalyst Center')
+    logging.debug('Collected complete site list from Cisco Catalyst Center')
     
     device_inventory = []
     items=0
@@ -116,7 +116,7 @@ def get_device_data(client,logging):
             #AP have no interfaces in CATC    
             if not 'Unified AP' in device.family:
                 try:
-                    logging.info(f"Retrieving interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
+                    logging.debug(f"Retrieving interfaces for device #{items}/{str(device_count)}: {device['hostname']}")
                     response = client.devices.get_interface_info_by_id(device_id=device['id'])        
                     interfaces.extend(response['response'])  
                     device.interfaces=interfaces

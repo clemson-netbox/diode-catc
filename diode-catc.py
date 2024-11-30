@@ -81,12 +81,12 @@ def main():
 
     try:
         # Connect to Catalyst Center
-        logging.info(f"Attempting to connect to Catalyst Center at {args.catc_host}...")
+        logging.debug(f"Attempting to connect to Catalyst Center at {args.catc_host}...")
         catc = connect_to_catc(args.catc_host, args.catc_user, args.catc_password, args.catc_verify)
         logging.info("Successfully connected to Catalyst Center.")
 
         # Connect to Diode
-        logging.info(f"Attempting to connect to Diode at {args.diode_server}...")
+        logging.debug(f"Attempting to connect to Diode at {args.diode_server}...")
         with DiodeClient(
             target=f"grpc://{args.diode_server}",
             app_name="diode-catc",

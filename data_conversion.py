@@ -53,11 +53,11 @@ def prepare_data(client,devices,logging):
                 tags=["Diode-CATC-Agent","Diode"],
             )
             entities.append(Entity(device=device_entity))
-            logging.info(f"Processed device: {device.hostname}")
+            logging.debug(f"Processed device: {device.hostname}")
 
             #TODO: Create Location, Rack, and assign device to rack when diode supports
 
-            logging.info(f"Processing interfaces and IPs for device: {device.hostname}")
+            logging.debug(f"Processing interfaces and IPs for device: {device.hostname}")
 
             # Process interfaces for the device
             if 'Unified AP' in device.family:
@@ -147,13 +147,13 @@ def prepare_data(client,devices,logging):
                         )
                         
             # Ingest data into Diode
-            logging.warning(f"Ingesting batch device data into Diode...")
-            if items > 1000:
+            logging.info(f"Ingesting 500 entity batch device data into Diode...")
+            if items > 500:
                 response = client.ingest(entities=entities)# + interface_entities)
                 if response.errors:
                     logging.error(f"Errors during ingestion: {response.errors}")
                 else:
-                    logging.info("Data ingested successfully into Diode.")
+                    logging.debug("Data ingested successfully into Diode.")
                 entities = []
                 items = 1
                 
