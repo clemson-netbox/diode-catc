@@ -19,11 +19,8 @@ def prepare_data(client,devices,logging):
     # 'serialNumber': 'FJC2139M0TN', 'series': 'Cisco 2700E Series Unified Access Points', 'snmpContact': '', 'snmpLocation': 'Edisto Tower E', 
     # 'softwareVersion': '8.5.182.105', 'syncRequestedByApp': '', 'tagCount': '0', 'tunnelUdpPort': '16666', 'type': 'Cisco 2700E Unified Access Point', 
     # 'upTime': '56 days, 13:35:07.570', 'uptimeSeconds': 4927533, 'vendor': 'NA'}  
-    
-    items = 0
-     
+         
     for device in devices:
-        items += 1
         
         try:
             # location = transformer.extract_location(device_data.get("site"))
@@ -147,7 +144,7 @@ def prepare_data(client,devices,logging):
                         )
                         
             # Ingest data into Diode
-            if items > 200:
+            if len(entities) > 10000:
                 logging.info(f"Ingesting {len(entities)} entity batch device data into Diode...")
                 response = client.ingest(entities=entities)# + interface_entities)
                 if response.errors:
@@ -155,7 +152,6 @@ def prepare_data(client,devices,logging):
                 else:
                     logging.debug("Data ingested successfully into Diode.")
                 entities = []
-                items = 1
                 
         except Exception as device_error:
             logging.error(
