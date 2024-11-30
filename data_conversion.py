@@ -103,6 +103,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                             interface_entity = Interface(
                                 name=interface.get("portName"),
                                 mac_address=interface.get("macAddress"),
+                                device=device_entity, 
                                 description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
                                 type=transformer.infer_interface_type(
                                     interface.get("portName"), interface.get("speed")
