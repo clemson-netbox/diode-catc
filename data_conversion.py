@@ -2,7 +2,7 @@ from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Prefix, 
 from transformer import Transformer
 
 
-def prepare_data(client,devices,logging):
+def prepare_data(client,devices,logging,skip_interfaces=False):
     
     transformer = Transformer("includes/site_rules.yml","includes/skip_device_rules.yml")
     entities = []
@@ -19,7 +19,9 @@ def prepare_data(client,devices,logging):
     # 'serialNumber': 'FJC2139M0TN', 'series': 'Cisco 2700E Series Unified Access Points', 'snmpContact': '', 'snmpLocation': 'Edisto Tower E', 
     # 'softwareVersion': '8.5.182.105', 'syncRequestedByApp': '', 'tagCount': '0', 'tunnelUdpPort': '16666', 'type': 'Cisco 2700E Unified Access Point', 
     # 'upTime': '56 days, 13:35:07.570', 'uptimeSeconds': 4927533, 'vendor': 'NA'}  
-         
+    if skip_interfaces:
+        logging.info("Skipping Discovery of Interfaces")
+        
     for device in devices:
         
         try:
@@ -56,94 +58,96 @@ def prepare_data(client,devices,logging):
 
             logging.debug(f"Processing interfaces and IPs for device: {device.hostname}")
 
-            # Process interfaces for the device
-            if 'Unified AP' in device.family:
-                interface_entity = Interface(
-                        name='mgmt0',
-                        mac_address=device.get("macAddress"),
-                        device=device_entity, 
-                        description=f"{device_name}: Management Interface",
-                        type="1000base-t",
-                        speed=1000000, 
-                        enabled=True,
-                        mgmt_only=True,
-                        tags=["Diode-CATC-Agent","Diode"],
-                    )
-                entities.append(Entity(interface=interface_entity))
-                ip_entity = IPAddress(
-                    address=device['managementIpAddress'],
-                    interface=interface_entity,
-                    device=device_entity,
-                    description=f"{device_name}: mgmt0",
-                    tags=["Diode-CATC-Agent","Diode"],
-                )
-                entities.append(Entity(ip_address=ip_entity))
-                logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
+            if not skip_interfaces:
 
-                interface_entity = Interface(
-                        name='radio0',
-                        device=device_entity, 
-                        mac_address=device.get("apEthernetMacAddress"),
-                        description=f"{device_name} Radio Interface",
-                        type='other-wireless',
-                        enabled=True,
-                        tags=["Diode-CATC-Agent","Diode"],
-                    )
-                entities.append(Entity(interface=interface_entity))
-                logging.debug(f"Processed AP interface: radio0")
-            
-            else:
-                    
-                for interface in device.get("interfaces", []):
-                    try:
-                        interface_entity = Interface(
-                            name=interface.get("portName"),
-                            mac_address=interface.get("macAddress"),
-                            description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
-                            type=transformer.infer_interface_type(
-                                interface.get("portName"), interface.get("speed")
-                            ),
-                            speed=int(interface.get("speed", 0)),
-                            enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
-                            mtu=int(interface.get("mtu")),
+                # Process interfaces for the device
+                if 'Unified AP' in device.family:
+                    interface_entity = Interface(
+                            name='mgmt0',
+                            mac_address=device.get("macAddress"),
+                            device=device_entity, 
+                            description=f"{device_name}: Management Interface",
+                            type="1000base-t",
+                            speed=1000000, 
+                            enabled=True,
+                            mgmt_only=True,
                             tags=["Diode-CATC-Agent","Diode"],
                         )
-                        entities.append(Entity(interface=interface_entity))
-                        #TODO: assign LAG members if port-channel
-                        
-                        logging.debug(f"Processed interface: {interface.get('portName')}")
+                    entities.append(Entity(interface=interface_entity))
+                    ip_entity = IPAddress(
+                        address=device['managementIpAddress'],
+                        interface=interface_entity,
+                        device=device_entity,
+                        description=f"{device_name}: mgmt0",
+                        tags=["Diode-CATC-Agent","Diode"],
+                    )
+                    entities.append(Entity(ip_address=ip_entity))
+                    logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
-
-                        try:
-                            if interface.get('ipv4Address'):
-                                ip_data = IPAddress(
-                                    address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
-                                    interface=interface_entity,
-                                    device=device_entity,
-                                    description=f"{interface_entity.description}",
-                                    tags=["Diode-CATC-Agent","Diode"],
-                                )
-                                entities.append(Entity(ip_address=ip_data))
-
-                                if 'Vlan' in interface.get('portName'):
-                                    prefix_entity = Prefix(
-                                        prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
-                                        site = device_entity.site,
-                                        description = f"{interface.get('portName')}: {interface.get('description')} ({site_name})",
-                                        status='active',
-                                        tags=["Diode-CATC-Agent","Diode"],
-
-                                    )
-                                    entities.append(Entity(prefix=prefix_entity))
-                                    
-                               #TODO: Create VLAN when Diode Updated
-                        except Exception as ip_error:
-                            logging.error(f"Error processing IP: {ip_error}")
-
-                    except Exception as interface_error:
-                        logging.error(
-                            f"Error processing interface {device_name} {interface.get('portName', 'unknown')}: {interface_error}"
+                    interface_entity = Interface(
+                            name='radio0',
+                            device=device_entity, 
+                            mac_address=device.get("apEthernetMacAddress"),
+                            description=f"{device_name} Radio Interface",
+                            type='other-wireless',
+                            enabled=True,
+                            tags=["Diode-CATC-Agent","Diode"],
                         )
+                    entities.append(Entity(interface=interface_entity))
+                    logging.debug(f"Processed AP interface: radio0")
+                
+                else:
+                        
+                    for interface in device.get("interfaces", []):
+                        try:
+                            interface_entity = Interface(
+                                name=interface.get("portName"),
+                                mac_address=interface.get("macAddress"),
+                                description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
+                                type=transformer.infer_interface_type(
+                                    interface.get("portName"), interface.get("speed")
+                                ),
+                                speed=int(interface.get("speed", 0)),
+                                enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
+                                mtu=int(interface.get("mtu")),
+                                tags=["Diode-CATC-Agent","Diode"],
+                            )
+                            entities.append(Entity(interface=interface_entity))
+                            #TODO: assign LAG members if port-channel
+                            
+                            logging.debug(f"Processed interface: {interface.get('portName')}")
+
+
+                            try:
+                                if interface.get('ipv4Address'):
+                                    ip_data = IPAddress(
+                                        address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
+                                        interface=interface_entity,
+                                        device=device_entity,
+                                        description=f"{interface_entity.description}",
+                                        tags=["Diode-CATC-Agent","Diode"],
+                                    )
+                                    entities.append(Entity(ip_address=ip_data))
+
+                                    if 'Vlan' in interface.get('portName'):
+                                        prefix_entity = Prefix(
+                                            prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
+                                            site = device_entity.site,
+                                            description = f"{interface.get('portName')}: {interface.get('description')} ({site_name})",
+                                            status='active',
+                                            tags=["Diode-CATC-Agent","Diode"],
+
+                                        )
+                                        entities.append(Entity(prefix=prefix_entity))
+                                        
+                                #TODO: Create VLAN when Diode Updated
+                            except Exception as ip_error:
+                                logging.error(f"Error processing IP: {ip_error}")
+
+                        except Exception as interface_error:
+                            logging.error(
+                                f"Error processing interface {device_name} {interface.get('portName', 'unknown')}: {interface_error}"
+                            )
                         
             # Ingest data into Diode
             if len(entities) > 10000:

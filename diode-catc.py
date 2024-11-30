@@ -63,6 +63,13 @@ def parse_arguments():
         default=os.getenv("LOG_LEVEL", "INFO"),
         help="Logging Level INFO, WARNING, ERROR, DEBUG"
     )
+    
+    parser.add_argument(
+        "--skip-interfaces",
+        default=os.getenv("SKIP_INTERFACES", "false").lower() in ("true", "1", "yes"),
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        help="Skip Collecting interfaces (default: true, or set via SKIP_INTERFACES environment variable)"
+    )
 
     return parser.parse_args()
 
@@ -97,7 +104,7 @@ def main():
 
             # Fetch data from Catalyst Center
             logging.info("Retrieving device data from Catalyst Center...")
-            devices = get_device_data(catc,logging)
+            devices = get_device_data(catc,logging,args.skip_interfaces)
             logging.info(f"Retrieved {len(devices)} devices.")
 
             # Prepare data into Diode-compatible entities
