@@ -127,7 +127,7 @@ def prepare_data(client,devices,logging):
                                     prefix_entity = Prefix(
                                         prefix=transformer.get_network_addr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                         site = device_entity.site,
-                                        description = f"{interface_entity.description} ({site_name})",
+                                        description = f"{interface.get('portName')} {interface.get('description')}({site_name})",
                                         status='active',
                                         tags=["Diode-CATC-Agent","Diode"],
 

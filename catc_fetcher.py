@@ -125,7 +125,7 @@ def get_device_data(client,logging):
                     continue
     
         except Exception as e:
-            logging.error(f"An error occurred collecting device data: {e}")
+            logging.error(f"An error occurred collecting device data: {device.get('hostname')} {e}")
             continue
         
         device_inventory.append(device)
