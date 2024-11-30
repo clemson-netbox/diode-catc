@@ -147,7 +147,7 @@ def prepare_data(client,devices,logging):
                         )
                         
             # Ingest data into Diode
-            logging.info(f"Ingesting 500 entity batch device data into Diode...")
+            logging.info(f"Ingesting {len(entities)} entity batch device data into Diode...")
             if items > 500:
                 response = client.ingest(entities=entities)# + interface_entities)
                 if response.errors:
