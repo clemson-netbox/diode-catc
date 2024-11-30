@@ -24,6 +24,7 @@ def prepare_data(client,devices,logging):
      
     for device in devices:
         items += 1
+        
         try:
             # location = transformer.extract_location(device_data.get("site"))
             # if len(location) < 1:
@@ -144,9 +145,10 @@ def prepare_data(client,devices,logging):
                         logging.error(
                             f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                         )
+                        
             # Ingest data into Diode
             logging.info(f"Ingesting batch device data into Diode...")
-            if items == 500:
+            if items > 1000:
                 response = client.ingest(entities=entities)# + interface_entities)
                 if response.errors:
                     logging.error(f"Errors during ingestion: {response.errors}")
