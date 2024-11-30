@@ -19,9 +19,11 @@ def prepare_data(client,devices,logging):
     # 'serialNumber': 'FJC2139M0TN', 'series': 'Cisco 2700E Series Unified Access Points', 'snmpContact': '', 'snmpLocation': 'Edisto Tower E', 
     # 'softwareVersion': '8.5.182.105', 'syncRequestedByApp': '', 'tagCount': '0', 'tunnelUdpPort': '16666', 'type': 'Cisco 2700E Unified Access Point', 
     # 'upTime': '56 days, 13:35:07.570', 'uptimeSeconds': 4927533, 'vendor': 'NA'}  
-
+    
+    items = 0
+     
     for device in devices:
-        
+        items += 1
         try:
             # location = transformer.extract_location(device_data.get("site"))
             # if len(location) < 1:
@@ -143,13 +145,15 @@ def prepare_data(client,devices,logging):
                             f"Error processing interface {interface.get('portName', 'unknown')}: {interface_error}"
                         )
             # Ingest data into Diode
-            logging.info(f"Ingesting device {device_name} data into Diode...")
-            response = client.ingest(entities=entities)# + interface_entities)
-            if response.errors:
-                logging.error(f"Errors during ingestion: {response.errors}")
-            else:
-                logging.info("Data ingested successfully into Diode.")
-            entities = []
+            logging.info(f"Ingesting batch device data into Diode...")
+            if items == 500:
+                response = client.ingest(entities=entities)# + interface_entities)
+                if response.errors:
+                    logging.error(f"Errors during ingestion: {response.errors}")
+                else:
+                    logging.info("Data ingested successfully into Diode.")
+                entities = []
+                items = 1
                 
         except Exception as device_error:
             logging.error(
