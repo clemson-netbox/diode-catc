@@ -73,6 +73,7 @@ def prepare_data(client,devices,logging):
                 ip_entity = IPAddress(
                     address=device['managementIpAddress'],
                     interface=interface_entity,
+                    device=device_entity,
                     description=f"{device_name}: mgmt0",
                     tags=["Diode-CATC-Agent","Diode"],
                 )
@@ -118,6 +119,7 @@ def prepare_data(client,devices,logging):
                                 ip_data = IPAddress(
                                     address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
                                     interface=interface_entity,
+                                    device=device_entity,
                                     description=f"{interface_entity.description}",
                                     tags=["Diode-CATC-Agent","Diode"],
                                 )
