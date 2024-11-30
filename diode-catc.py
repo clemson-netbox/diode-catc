@@ -96,9 +96,9 @@ def main():
             logging.info("Successfully connected to Diode.")
 
             # Fetch data from Catalyst Center
-            logging.info("Fetching device data from Catalyst Center...")
+            logging.info("Retrieving device data from Catalyst Center...")
             devices = get_device_data(catc,logging)
-            logging.info(f"Fetched {len(devices)} devices.")
+            logging.info(f"Retrieved {len(devices)} devices.")
 
             # Prepare data into Diode-compatible entities
             logging.info("Transforming device data into Diode-compatible format...")

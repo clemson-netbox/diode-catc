@@ -22,7 +22,7 @@ class Transformer:
     def should_skip_device(self, name):
         for pattern in self.skip_device_rules:
             if re.match(pattern, name, flags=re.IGNORECASE):
-                logging.info(f"Skipping Device: {name} (matched pattern: {pattern})")
+                logging.debug(f"Skipping Device: {name} (matched pattern: {pattern})")
                 return True
         return False       
     

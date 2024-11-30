@@ -73,7 +73,7 @@ def get_device_data(client,logging):
 
     response = client.sites.get_site_count()
     site_count = response['response']    
-    logging.debug(f'Retrieving {site_count} sites from Cisco Catalyst Center')
+    logging.info(f'Retrieving {site_count} sites from Cisco Catalyst Center (this takes a while)')
     offset = 1
     limit = 500
     site_list = []
@@ -84,7 +84,6 @@ def get_device_data(client,logging):
         site_list.extend(response['response'])
         items += limit
         logging.debug(f"Retrieved {items} sites")
-    logging.debug('Collected complete site list from Cisco Catalyst Center')
     
     device_inventory = []
     items=0
@@ -107,7 +106,7 @@ def get_device_data(client,logging):
             else:
                 response = client.devices.get_device_detail(identifier='uuid', search_by=device['id'])
                 device.site = response['response']['location']
-                logging.warning(f"Cache Miss: {hostname}: {device.site}")
+                logging.debug(f"Cache Miss: {hostname}: {device.site}")
                 if site_prefix != hostname:
                     site_cache[site_prefix] = device.site
                     logging.debug(f"CACHING prefix {site_prefix}")
@@ -130,5 +129,6 @@ def get_device_data(client,logging):
             continue
         
         device_inventory.append(device)
-        
+    
+    logging.info('Collected complete site list from Cisco Catalyst Center')
     return device_inventory
