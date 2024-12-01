@@ -65,7 +65,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                     interface_entity = Interface(
                             name='mgmt0',
                             mac_address=device.get("macAddress"),
-                            device=device_entity, 
+                            device=device_name, 
                             description=f"{device_name}: Management Interface",
                             type="1000base-t",
                             speed=1000000, 
@@ -76,8 +76,8 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                     entities.append(Entity(interface=interface_entity))
                     ip_entity = IPAddress(
                         address=device['managementIpAddress'],
-                        interface=interface_entity,
-                        device=device_entity,
+                        interface='mgmt0',
+                        device=device_name,
                         description=f"{device_name}: mgmt0",
                         tags=["Diode-CATC-Agent","Diode"],
                     )
@@ -86,7 +86,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
 
                     interface_entity = Interface(
                             name='radio0',
-                            device=device_entity, 
+                            device=device_name, 
                             mac_address=device.get("apEthernetMacAddress"),
                             description=f"{device_name} Radio Interface",
                             type='other-wireless',
@@ -103,7 +103,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                             interface_entity = Interface(
                                 name=interface.get("portName"),
                                 mac_address=interface.get("macAddress"),
-                                device=device_entity, 
+                                device=device_name, 
                                 description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
                                 type=transformer.infer_interface_type(
                                     interface.get("portName"), interface.get("speed")
@@ -123,8 +123,8 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                                 if interface.get('ipv4Address'):
                                     ip_data = IPAddress(
                                         address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
-                                        interface=interface_entity,
-                                        device=device_entity,
+                                        interface=interface.get('portName'),
+                                        device=device_name,
                                         description=f"{interface_entity.description}",
                                         tags=["Diode-CATC-Agent","Diode"],
                                     )
