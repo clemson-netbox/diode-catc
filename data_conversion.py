@@ -1,6 +1,6 @@
 from netboxlabs.diode.sdk.ingester import Device, Interface, IPAddress, Prefix, Entity
 from transformer import Transformer
-
+import re
 
 def prepare_data(client,devices,logging,skip_interfaces=False):
     
@@ -32,10 +32,12 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
             #     location = device["snmpLocation"]
         
                 
-            #TODO: Handle stackwise when multi serial#s
             site_name = transformer.site_to_site(transformer.extract_site(device.get("site")))
             device_name=transformer.transform_name(device.get("hostname"))
+            
+            #TODO: Handle stackwise when multi serial#s
 
+            serial_number=re.replace('^([^,*),.*$','\1',device.get("serialNumber").upper() if device.get("serialNumber") else "Unknown")
             device_entity = Device(
                 name=device_name,
                 device_type=transformer.transform_device_type(device.get("platformId")),
@@ -44,7 +46,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                 platform=transformer.transform_platform(
                     device.get("softwareType") if device.get("softwareType") else "IOS", device.get("softwareVersion")
                 ),
-                serial=device.get("serialNumber").upper() if device.get("serialNumber") else None,
+                serial=serial_number,
                 site=site_name,
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
