@@ -49,7 +49,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                 # location=location,  
                 # TODO: Uncomment when Diode adds location to device
                 status=transformer.transform_status(device.get("reachabilityStatus")),
-                #tags=["Diode-CATC-Agent","Diode"],
+                tags=["Diode-CATC-Agent","Diode"],
             )
             entities.append(Entity(device=device_entity))
             logging.debug(f"Processed device: {device.hostname}")
@@ -65,33 +65,33 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                     interface_entity = Interface(
                             name='mgmt0',
                             mac_address=device.get("macAddress"),
-                            device=device_name, 
+                            device=device_entity, 
                             description=f"{device_name}: Management Interface",
                             type="1000base-t",
                             speed=1000000, 
                             enabled=True,
                             mgmt_only=True,
-                            #tags=["Diode-CATC-Agent","Diode"],
+                            tags=["Diode-CATC-Agent","Diode"],
                         )
                     entities.append(Entity(interface=interface_entity))
                     ip_entity = IPAddress(
                         address=device['managementIpAddress'],
-                        interface='mgmt0',
-                        device=device_name,
+                        interface=interface_entity,
+                        device=device_entity,
                         description=f"{device_name}: mgmt0",
-                        #tags=["Diode-CATC-Agent","Diode"],
+                        tags=["Diode-CATC-Agent","Diode"],
                     )
                     entities.append(Entity(ip_address=ip_entity))
                     logging.debug(f"Processed AP interface: mgmt0 / IP: {device['managementIpAddress']}")
 
                     interface_entity = Interface(
                             name='radio0',
-                            device=device_name, 
+                            device=device_entity, 
                             mac_address=device.get("apEthernetMacAddress"),
                             description=f"{device_name} Radio Interface",
                             type='other-wireless',
                             enabled=True,
-                            #tags=["Diode-CATC-Agent","Diode"],
+                            tags=["Diode-CATC-Agent","Diode"],
                         )
                     entities.append(Entity(interface=interface_entity))
                     logging.debug(f"Processed AP interface: radio0")
@@ -103,7 +103,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                             interface_entity = Interface(
                                 name=interface.get("portName"),
                                 mac_address=interface.get("macAddress"),
-                                device=device_name, 
+                                device=device_entity,
                                 description=f"{device_name}: {interface.get('portName')} ({interface.get('description')})",
                                 type=transformer.infer_interface_type(
                                     interface.get("portName"), interface.get("speed")
@@ -111,7 +111,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                                 speed=int(interface.get("speed", 0)),
                                 enabled=True if 'status' in interface and interface.get("status") in ["connected", "up", "reachable"] else False,
                                 mtu=int(interface.get("mtu")),
-                                #tags=["Diode-CATC-Agent","Diode"],
+                                tags=["Diode-CATC-Agent","Diode"],
                             )
                             entities.append(Entity(interface=interface_entity))
                             #TODO: assign LAG members if port-channel
@@ -123,10 +123,10 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                                 if interface.get('ipv4Address'):
                                     ip_data = IPAddress(
                                         address=transformer.get_cidr(interface.get('ipv4Address'),interface.get('ipv4Mask')),
-                                        interface=interface.get('portName'),
-                                        device=device_name,
+                                        interface=interface_entity,
+                                        device=device_entity,
                                         description=f"{interface_entity.description}",
-                                        #tags=["Diode-CATC-Agent","Diode"],
+                                        tags=["Diode-CATC-Agent","Diode"],
                                     )
                                     entities.append(Entity(ip_address=ip_data))
 
@@ -136,7 +136,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
                                             site = device_entity.site,
                                             description = f"{interface.get('portName')}: {interface.get('description')} ({site_name})",
                                             status='active',
-                                            #tags=["Diode-CATC-Agent","Diode"],
+                                            tags=["Diode-CATC-Agent","Diode"],
 
                                         )
                                         entities.append(Entity(prefix=prefix_entity))
