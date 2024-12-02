@@ -37,7 +37,7 @@ def prepare_data(client,devices,logging,skip_interfaces=False):
             
             #TODO: Handle stackwise when multi serial#s
 
-            serial_number=re.sub('^([^\,]*)\,.*$','\1',device.get("serialNumber").upper() if device.get("serialNumber") else "Unknown")
+            serial_number=re.sub('^([^,]*),.*$','\1',device.get("serialNumber").upper() if device.get("serialNumber") else "Unknown")
             device_entity = Device(
                 name=device_name,
                 device_type=transformer.transform_device_type(device.get("platformId")),
