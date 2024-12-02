@@ -1,5 +1,5 @@
  - ['(.+) CEO','\1 County Extension Office']
- - ['^ITC$','Clemson Information Technology Center']
+ - ['^ITC$','Clemson University Information Technology Center']
  - ['^UCSD$','University of California San Diego']
  - ['^Poole$','Poole Agricultural Center']
  - ['^/WFIC \(Watt Family Innovation Center\)$','Watt Family Innovation Center']
